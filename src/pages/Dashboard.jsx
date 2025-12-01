@@ -86,7 +86,8 @@ export default function Dashboard() {
     if (!subscription) return 0;
     if (subscription.plan === 'enterprise') return Infinity;
     if (subscription.plan === 'standard') return 100;
-    if (subscription.plan === 'trial') return 10; // 10 analyses TOTAL (RAMPE + Simulateur)
+    if (subscription.plan === 'student') return 30;
+    if (subscription.plan === 'trial') return 10;
     return 0;
   };
 
