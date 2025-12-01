@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FlaskConical, Plus, Trash2, Loader2, AlertTriangle, Search } from 'lucide-react';
+import { FlaskConical, Plus, Trash2, Loader2, AlertTriangle, Search, Ban } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { checkSubstancesForAbuse } from './AbuseFilter';
 
 export default function ChemicalAnalysisForm({ onSubmit, isLoading }) {
   const [substances, setSubstances] = useState([{ name: '', cas: '', role: 'reactif' }]);
+  const [abuseWarning, setAbuseWarning] = useState(null);
 
   const addSubstance = () => {
     setSubstances([...substances, { name: '', cas: '', role: 'reactif' }]);
@@ -29,6 +31,25 @@ export default function ChemicalAnalysisForm({ onSubmit, isLoading }) {
     e.preventDefault();
     const validSubstances = substances.filter(s => s.name.trim() || s.cas.trim());
     if (validSubstances.length === 0) return;
+
+    // Check for abuse
+    const abuseCheck = checkSubstancesForAbuse(validSubstances);
+    if (abuseCheck.blocked) {
+      setAbuseWarning({
+        type: 'blocked',
+        message: 'Cette recherche n\'est pas autorisée pour des raisons de sécurité.'
+      });
+      return;
+    }
+    if (abuseCheck.warning) {
+      setAbuseWarning({
+        type: 'warning',
+        message: abuseCheck.reasons[0]
+      });
+    } else {
+      setAbuseWarning(null);
+    }
+
     onSubmit(validSubstances);
   };
 
@@ -43,6 +64,26 @@ export default function ChemicalAnalysisForm({ onSubmit, isLoading }) {
           Aucun protocole expérimental n'est fourni.</p>
         </div>
       </div>
+
+      {abuseWarning && (
+        <div className={`rounded-xl p-4 flex items-start gap-3 ${
+          abuseWarning.type === 'blocked' 
+            ? 'bg-red-50 border border-red-200' 
+            : 'bg-orange-50 border border-orange-200'
+        }`}>
+          <Ban className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+            abuseWarning.type === 'blocked' ? 'text-red-600' : 'text-orange-600'
+          }`} />
+          <div className={`text-sm ${
+            abuseWarning.type === 'blocked' ? 'text-red-800' : 'text-orange-800'
+          }`}>
+            <p className="font-medium mb-1">
+              {abuseWarning.type === 'blocked' ? 'Requête bloquée' : 'Attention'}
+            </p>
+            <p>{abuseWarning.message}</p>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
