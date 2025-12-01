@@ -92,15 +92,25 @@ CONDITIONS SPÉCIFIÉES:
 - Durée: ${conditions.time || 'Non spécifiée'}
 - Autres: ${conditions.other || 'Aucune'}` : '';
 
-    const prompt = `Tu es un expert en chimie. RECHERCHE DANS LES BASES DE DONNÉES SCIENTIFIQUES cette réaction:
+    const prompt = `Tu es un expert en chimie. RECHERCHE UNIQUEMENT dans ces bases de données AUTORISÉES:
+
+SOURCES AUTORISÉES UNIQUEMENT:
+- PubChem (NIH/NCBI) - https://pubchem.ncbi.nlm.nih.gov
+- ECHA (European Chemicals Agency) - https://echa.europa.eu
+- ORD (Open Reaction Database) - https://open-reaction-database.org
+- CompTox (EPA) - https://comptox.epa.gov
+- Europe PMC (publications libres) - https://europepmc.org
+
+NE PAS UTILISER: SciFinder, Reaxys, ACS payant, RSC payant, Wiley, Elsevier (réservés clients Entreprise)
 
 RÉACTIFS: ${reactantsList}
 ${conditionsText}
 
 INSTRUCTIONS CRITIQUES:
-1. RECHERCHE cette réaction exacte dans les publications scientifiques (SciFinder, Reaxys, PubChem, ECHA, ACS, RSC, Organic Syntheses, etc.)
-2. Si tu trouves des publications documentant cette réaction, CITE-LES avec DOI/URL
-3. Si la réaction n'est pas documentée, indique-le clairement
+1. RECHERCHE cette réaction UNIQUEMENT dans les sources autorisées ci-dessus
+2. CITE chaque source avec son URL/DOI vérifié
+3. Attribue un SCORE DE PROVENANCE (0-100) basé sur la fiabilité des sources trouvées
+4. Si la réaction n'est pas documentée dans ces sources, indique-le clairement
 
 FOURNIS:
 
@@ -124,6 +134,21 @@ FOURNIS:
    - Contrôle cinétique vs thermodynamique si applicable
    - Effet du solvant, température, catalyseur
 
+4B. PARAMÈTRES D'INFLUENCE - TRÈS IMPORTANT:
+   Pour chaque paramètre, indique son NIVEAU D'INFLUENCE (critique/élevé/modéré/faible/nul):
+   
+   - TEMPÉRATURE: impact sur vitesse et sélectivité, plage optimale, effet Arrhenius
+   - PRESSION: impact (surtout pour gaz), conditions optimales
+   - CATALYSEUR: nécessité, type, effet sur vitesse et sélectivité
+   - SOLVANT: polarité, effet sur mécanisme et vitesse
+   - CONCENTRATION: ordre de réaction, effet sur vitesse
+   - pH: si applicable, impact sur réactivité
+   - TEMPS: cinétique, temps optimal
+   
+   Pour chaque paramètre influent, explique:
+   - Comment l'augmenter/diminuer affecte la réaction
+   - Conseil pour optimiser (ex: "Pour augmenter la vitesse: augmenter T° de 10°C double environ la vitesse")
+
 5. RISQUES - AVEC JUSTIFICATION ET SOURCE:
    Pour chaque risque:
    - Description du risque
@@ -138,13 +163,23 @@ FOURNIS:
    - Stéréochimie si applicable
    - SOURCE qui documente ce mécanisme
 
-7. RÉFÉRENCES BIBLIOGRAPHIQUES OBLIGATOIRES:
-   Pour chaque affirmation importante, cite:
-   - Auteurs, Titre, Journal, Année, DOI
-   - Ou: Base de données (PubChem CID, ECHA, Sigma-Aldrich)
+7. RÉFÉRENCES - UNIQUEMENT SOURCES AUTORISÉES:
+   Cite UNIQUEMENT des sources de: PubChem, ECHA, ORD, CompTox, Europe PMC
+   Pour chaque référence:
+   - Nom de la base de données
+   - Identifiant (CID, EC number, etc.)
+   - URL directe vérifiable
+
+8. SCORE DE PROVENANCE (0-100):
+   Calcule un score basé sur:
+   - 100: Données expérimentales vérifiées dans ORD ou ECHA
+   - 80-99: Référencé dans PubChem avec sources primaires
+   - 60-79: Mentionné dans Europe PMC (publications)
+   - 40-59: Données calculées/prédites (CompTox)
+   - <40: Non trouvé dans sources autorisées
    
 AVERTISSEMENT: Le mécanisme est une PROPOSITION à vérifier par un chimiste qualifié.
-NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.`;
+NE FOURNIS QUE DES INFORMATIONS DES SOURCES AUTORISÉES.`;
 
     try {
       const response = await base44.integrations.Core.InvokeLLM({
@@ -153,6 +188,8 @@ NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.`;
         response_json_schema: {
           type: "object",
           properties: {
+            provenance_score: { type: "number" },
+            provenance_details: { type: "string" },
             reaction_documented: { type: "boolean" },
             documentation_sources: {
               type: "array",
@@ -215,6 +252,22 @@ NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.`;
                 catalyst_needed: { type: "boolean" },
                 catalyst_type: { type: "string" },
                 selectivity_factors: { type: "array", items: { type: "string" } }
+              }
+            },
+            parameters_influence: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  parameter: { type: "string" },
+                  influence_level: { type: "string", enum: ["critique", "élevé", "modéré", "faible", "nul"] },
+                  current_effect: { type: "string" },
+                  increase_effect: { type: "string" },
+                  decrease_effect: { type: "string" },
+                  optimization_tip: { type: "string" },
+                  optimal_range: { type: "string" },
+                  reference: { type: "string" }
+                }
               }
             },
             needs_more_conditions: { type: "boolean" },
