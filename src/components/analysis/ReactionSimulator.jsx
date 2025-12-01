@@ -90,48 +90,51 @@ CONDITIONS SPÉCIFIÉES:
 - Durée: ${conditions.time || 'Non spécifiée'}
 - Autres: ${conditions.other || 'Aucune'}` : '';
 
-    const prompt = `Tu es un expert en chimie organique et inorganique. Analyse cette réaction chimique:
+    const prompt = `Tu es un expert en chimie. RECHERCHE DANS LES BASES DE DONNÉES SCIENTIFIQUES cette réaction:
 
 RÉACTIFS: ${reactantsList}
 ${conditionsText}
 
-FOURNIS UNE ANALYSE COMPLÈTE:
+INSTRUCTIONS CRITIQUES:
+1. RECHERCHE cette réaction exacte dans les publications scientifiques (SciFinder, Reaxys, PubChem, ECHA, ACS, RSC, Organic Syntheses, etc.)
+2. Si tu trouves des publications documentant cette réaction, CITE-LES avec DOI/URL
+3. Si la réaction n'est pas documentée, indique-le clairement
 
-1. IDENTIFICATION DES RÉACTIFS (recherche PubChem par CAS si fourni):
-   - Nom exact, CAS vérifié, formule brute pour chaque réactif
+FOURNIS:
 
-2. TYPE DE RÉACTION:
-   - Identifie le type (Diels-Alder, substitution nucléophile, addition, élimination, oxydoréduction, etc.)
+1. RÉACTION DOCUMENTÉE ?
+   - OUI/NON - avec les références trouvées
+   - Si oui, cite la/les publication(s) principale(s)
 
-3. PRODUITS DE RÉACTION - TRÈS IMPORTANT:
-   Pour chaque produit possible, indique:
-   - Nom, CAS, formule brute
-   - Si c'est le produit MAJORITAIRE ou MINORITAIRE
-   - Sous quelles CONDITIONS ce produit est favorisé
+2. IDENTIFICATION DES RÉACTIFS (vérifié via PubChem/CAS):
+   - Nom exact, CAS, formule brute
+
+3. TOUS LES PRODUITS POSSIBLES - Basé sur la littérature:
+   Pour CHAQUE produit documenté dans les publications:
+   - Nom, CAS, formule
+   - MAJORITAIRE ou MINORITAIRE (avec % de rendement si connu)
+   - CONDITIONS exactes qui favorisent ce produit (T°, solvant, catalyseur, temps)
+   - RÉFÉRENCE de la publication qui documente ce produit
+   - Sélectivité (régio, stéréo) si applicable
+
+4. CONDITIONS ET SÉLECTIVITÉ:
+   - Quelles conditions donnent quel produit majoritaire ?
+   - Contrôle cinétique vs thermodynamique si applicable
+   - Effet du solvant, température, catalyseur
+
+5. RISQUES - AVEC JUSTIFICATION ET SOURCE:
+   Pour chaque risque:
+   - Description du risque
+   - Justification chimique/thermodynamique (avec données: ΔH, pKa, potentiel redox si pertinent)
+   - SOURCE qui documente ce risque (FDS, INRS, publication)
+
+6. RÉFÉRENCES BIBLIOGRAPHIQUES OBLIGATOIRES:
+   Pour chaque affirmation importante, cite:
+   - Auteurs, Titre, Journal, Année, DOI
+   - Ou: Base de données (PubChem CID, ECHA, Sigma-Aldrich)
    
-   Exemple Diels-Alder: précise quel isomère (endo/exo) est:
-   - Produit cinétique (basse température) 
-   - Produit thermodynamique (haute température)
-
-4. CONDITIONS CRITIQUES:
-   - Les conditions qui changent la sélectivité
-   - Température optimale
-   - Nécessité d'un catalyseur
-
-5. RISQUES DE SÉCURITÉ - AVEC JUSTIFICATION OBLIGATOIRE:
-   Pour CHAQUE risque identifié, fournis:
-   - Le risque précis
-   - La JUSTIFICATION chimique (pourquoi ce risque existe)
-   - La RÉFÉRENCE ou SOURCE qui documente ce risque
-   
-   Exemple: "Acide fort + Base forte → Réaction exothermique (ΔH ≈ -57 kJ/mol pour neutralisation) - Source: Atkins Physical Chemistry"
-
-6. RÉFÉRENCES SCIENTIFIQUES - OBLIGATOIRE:
-   - Cite 2-3 publications ou sources fiables pour CHAQUE affirmation importante
-   - Inclure: auteur/organisation, titre, année, DOI ou URL si disponible
-   - Sources acceptées: PubChem, ECHA, INRS, ACS, RSC, Sigma-Aldrich SDS, manuels de référence (Atkins, March, Clayden)
-
-IMPORTANT: Ne fournis AUCUN protocole détaillé de manipulation.`;
+NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.
+Si une information n'est pas documentée, dis-le explicitement.`;
 
     try {
       const response = await base44.integrations.Core.InvokeLLM({
@@ -140,6 +143,21 @@ IMPORTANT: Ne fournis AUCUN protocole détaillé de manipulation.`;
         response_json_schema: {
           type: "object",
           properties: {
+            reaction_documented: { type: "boolean" },
+            documentation_sources: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  authors: { type: "string" },
+                  title: { type: "string" },
+                  journal: { type: "string" },
+                  year: { type: "string" },
+                  doi: { type: "string" },
+                  url: { type: "string" }
+                }
+              }
+            },
             reactants_identified: {
               type: "array",
               items: {
@@ -147,7 +165,8 @@ IMPORTANT: Ne fournis AUCUN protocole détaillé de manipulation.`;
                 properties: {
                   name: { type: "string" },
                   cas: { type: "string" },
-                  formula: { type: "string" }
+                  formula: { type: "string" },
+                  pubchem_cid: { type: "string" }
                 }
               }
             },
@@ -162,9 +181,19 @@ IMPORTANT: Ne fournis AUCUN protocole détaillé de manipulation.`;
                   cas: { type: "string" },
                   formula: { type: "string" },
                   yield_type: { type: "string", enum: ["majoritaire", "minoritaire", "trace"] },
+                  yield_percentage: { type: "string" },
                   conditions_favoring: { type: "string" },
                   is_kinetic_product: { type: "boolean" },
-                  is_thermodynamic_product: { type: "boolean" }
+                  is_thermodynamic_product: { type: "boolean" },
+                  selectivity: { type: "string" },
+                  reference: {
+                    type: "object",
+                    properties: {
+                      source: { type: "string" },
+                      doi: { type: "string" },
+                      url: { type: "string" }
+                    }
+                  }
                 }
               }
             },
@@ -592,6 +621,43 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
 
               {result.type === 'chemistry' && result.data && (
                 <div className="space-y-4">
+                  {/* Reaction documented status */}
+                  <div className={`p-4 rounded-lg ${result.data.reaction_documented ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      {result.data.reaction_documented ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                          <span className="font-medium text-emerald-800">Réaction documentée dans la littérature</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="w-5 h-5 text-amber-600" />
+                          <span className="font-medium text-amber-800">Réaction peu ou pas documentée</span>
+                        </>
+                      )}
+                    </div>
+                    {result.data.documentation_sources?.length > 0 && (
+                      <div className="space-y-1 mt-2">
+                        {result.data.documentation_sources.map((src, i) => (
+                          <div key={i} className="text-xs text-slate-600 flex items-start gap-1">
+                            <BookOpen className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                            <span>
+                              {src.authors && <span>{src.authors}. </span>}
+                              <span className="italic">{src.title}</span>
+                              {src.journal && <span>. {src.journal}</span>}
+                              {src.year && <span> ({src.year})</span>}
+                              {src.doi && (
+                                <a href={`https://doi.org/${src.doi}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-600 hover:underline">
+                                  DOI: {src.doi}
+                                </a>
+                              )}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Reaction Type */}
                   <div className="p-4 bg-purple-50 rounded-lg">
                     <p className="text-sm font-medium text-purple-800 mb-1">Type de réaction</p>
@@ -611,6 +677,11 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                             <span className="font-medium text-slate-900">{r.name}</span>
                             {r.cas && <span className="text-xs text-slate-500 ml-2">CAS: {r.cas}</span>}
                             {r.formula && <span className="text-xs text-blue-600 ml-2">{r.formula}</span>}
+                            {r.pubchem_cid && (
+                              <a href={`https://pubchem.ncbi.nlm.nih.gov/compound/${r.pubchem_cid}`} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 ml-2 hover:underline">
+                                PubChem
+                              </a>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -663,6 +734,22 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                               <p className="text-xs text-slate-600 mt-2">
                                 <span className="font-medium">Favorisé par:</span> {product.conditions_favoring}
                               </p>
+                            )}
+                            {product.selectivity && (
+                              <p className="text-xs text-slate-600">
+                                <span className="font-medium">Sélectivité:</span> {product.selectivity}
+                              </p>
+                            )}
+                            {product.reference && (
+                              <div className="mt-2 pt-2 border-t border-emerald-100 flex items-center gap-1 text-xs text-blue-600">
+                                <BookOpen className="w-3 h-3" />
+                                <span>{product.reference.source}</span>
+                                {product.reference.doi && (
+                                  <a href={`https://doi.org/${product.reference.doi}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                    DOI <ExternalLink className="w-3 h-3 inline" />
+                                  </a>
+                                )}
+                              </div>
                             )}
                           </div>
                         ))}
