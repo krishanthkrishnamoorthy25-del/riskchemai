@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import ReactionMechanism from './ReactionMechanism';
+import ParametersInfluence from './ParametersInfluence';
+import ProvenanceScore from './ProvenanceScore';
 import { 
   FlaskConical, 
   Dna, 
@@ -723,6 +725,15 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
 
               {result.type === 'chemistry' && result.data && (
                 <div className="space-y-4">
+                  {/* Provenance Score */}
+                  {result.data.provenance_score !== undefined && (
+                    <ProvenanceScore 
+                      score={result.data.provenance_score} 
+                      details={result.data.provenance_details}
+                      sources={result.data.documentation_sources}
+                    />
+                  )}
+
                   {/* Reaction documented status */}
                   <div className={`p-4 rounded-lg ${result.data.reaction_documented ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
                     <div className="flex items-center gap-2 mb-2">
@@ -856,6 +867,19 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Parameters Influence */}
+                  {result.data.parameters_influence?.length > 0 && (
+                    <div className="p-4 bg-slate-50 rounded-lg">
+                      <ParametersInfluence 
+                        parameters={result.data.parameters_influence}
+                        onAskOptimization={(param) => {
+                          // Could trigger a follow-up LLM query
+                          console.log('Ask optimization for:', param);
+                        }}
+                      />
                     </div>
                   )}
 
