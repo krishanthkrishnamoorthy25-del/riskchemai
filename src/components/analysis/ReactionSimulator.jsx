@@ -612,9 +612,23 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
               </div>
             </div>
 
+            {!canSimulate && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-3">
+                <p className="text-sm text-amber-800">
+                  Limite d'analyses atteinte. Passez à un plan supérieur pour continuer.
+                </p>
+              </div>
+            )}
+
+            {canSimulate && remainingAnalyses !== Infinity && (
+              <p className="text-xs text-slate-500 text-center mb-2">
+                {remainingAnalyses} analyse{remainingAnalyses > 1 ? 's' : ''} restante{remainingAnalyses > 1 ? 's' : ''}
+              </p>
+            )}
+
             <Button 
               onClick={() => simulateChemistry(false)}
-              disabled={isSimulating || !reactants.some(r => r.name.trim() || r.cas.trim())}
+              disabled={isSimulating || !reactants.some(r => r.name.trim() || r.cas.trim()) || !canSimulate}
               className="w-full bg-purple-600 hover:bg-purple-700"
             >
               {isSimulating ? (
@@ -671,9 +685,23 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                 </select>
               </div>
             </div>
+            {!canSimulate && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-3">
+                <p className="text-sm text-amber-800">
+                  Limite d'analyses atteinte. Passez à un plan supérieur pour continuer.
+                </p>
+              </div>
+            )}
+
+            {canSimulate && remainingAnalyses !== Infinity && (
+              <p className="text-xs text-slate-500 text-center mb-2">
+                {remainingAnalyses} analyse{remainingAnalyses > 1 ? 's' : ''} restante{remainingAnalyses > 1 ? 's' : ''}
+              </p>
+            )}
+
             <Button 
               onClick={simulateBiotech}
-              disabled={isSimulating || (!organism.trim() && !process.trim())}
+              disabled={isSimulating || (!organism.trim() && !process.trim()) || !canSimulate}
               className="w-full bg-emerald-600 hover:bg-emerald-700"
             >
               {isSimulating ? (
