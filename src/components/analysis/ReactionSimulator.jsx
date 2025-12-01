@@ -255,7 +255,46 @@ NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.`;
                 }
               }
             },
-            safety_summary: { type: "string" }
+            safety_summary: { type: "string" },
+            mechanism: {
+              type: "object",
+              properties: {
+                type: { type: "string" },
+                literature_source: { type: "string" },
+                doi: { type: "string" },
+                stereochemistry: { type: "string" },
+                concerted: { type: "boolean" },
+                overall_scheme: { type: "string" },
+                notes: { type: "string" },
+                steps: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" },
+                      description: { type: "string" },
+                      rate_determining: { type: "boolean" },
+                      arrow_type: { type: "string", enum: ["full", "half", "equilibrium", "curved"] },
+                      arrow_label: { type: "string" },
+                      electrons_moved: { type: "string" },
+                      electronic_details: { type: "string" },
+                      reference: { type: "string" },
+                      structures: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            formula: { type: "string" },
+                            name: { type: "string" },
+                            role: { type: "string", enum: ["reactant", "intermediate", "product", "catalyst", "leaving_group"] }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       });
