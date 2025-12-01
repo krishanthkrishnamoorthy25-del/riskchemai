@@ -118,13 +118,18 @@ FOURNIS UNE ANALYSE COMPLÈTE:
    - Température optimale
    - Nécessité d'un catalyseur
 
-5. RISQUES DE SÉCURITÉ:
-   - Exothermicité
-   - Gaz toxiques possibles
-   - Incompatibilités
+5. RISQUES DE SÉCURITÉ - AVEC JUSTIFICATION OBLIGATOIRE:
+   Pour CHAQUE risque identifié, fournis:
+   - Le risque précis
+   - La JUSTIFICATION chimique (pourquoi ce risque existe)
+   - La RÉFÉRENCE ou SOURCE qui documente ce risque
+   
+   Exemple: "Acide fort + Base forte → Réaction exothermique (ΔH ≈ -57 kJ/mol pour neutralisation) - Source: Atkins Physical Chemistry"
 
-6. RÉFÉRENCES SCIENTIFIQUES:
-   - Cite 2-3 publications ou sources fiables (ACS, RSC, PubChem, ECHA)
+6. RÉFÉRENCES SCIENTIFIQUES - OBLIGATOIRE:
+   - Cite 2-3 publications ou sources fiables pour CHAQUE affirmation importante
+   - Inclure: auteur/organisation, titre, année, DOI ou URL si disponible
+   - Sources acceptées: PubChem, ECHA, INRS, ACS, RSC, Sigma-Aldrich SDS, manuels de référence (Atkins, March, Clayden)
 
 IMPORTANT: Ne fournis AUCUN protocole détaillé de manipulation.`;
 
@@ -177,13 +182,23 @@ IMPORTANT: Ne fournis AUCUN protocole détaillé de manipulation.`;
             conditions_needed: { type: "array", items: { type: "string" } },
             danger_level: { type: "string", enum: ["faible", "modéré", "élevé", "critique"] },
             risks: {
-              type: "object",
-              properties: {
-                exothermic: { type: "boolean" },
-                exothermic_details: { type: "string" },
-                toxic_gases: { type: "array", items: { type: "string" } },
-                explosion_risk: { type: "boolean" },
-                incompatibilities: { type: "array", items: { type: "string" } }
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  risk_type: { type: "string" },
+                  description: { type: "string" },
+                  justification: { type: "string" },
+                  severity: { type: "string", enum: ["faible", "modéré", "élevé", "critique"] },
+                  reference: {
+                    type: "object",
+                    properties: {
+                      source: { type: "string" },
+                      detail: { type: "string" },
+                      url: { type: "string" }
+                    }
+                  }
+                }
               }
             },
             required_ppe: { type: "array", items: { type: "string" } },
@@ -689,27 +704,52 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                     </Badge>
                   </div>
 
-                  {/* Risks */}
-                  {result.data.risks && (
+                  {/* Risks with justification */}
+                  {result.data.risks?.length > 0 && (
                     <div className="p-4 bg-red-50 rounded-lg">
-                      <p className="text-sm font-medium text-red-800 mb-2">⚠️ Risques</p>
-                      <div className="space-y-2 text-sm">
-                        {result.data.risks.exothermic && (
-                          <div className="flex items-start gap-2">
-                            <Thermometer className="w-4 h-4 text-red-600 mt-0.5" />
-                            <div>
-                              <span className="font-medium text-red-700">Réaction exothermique</span>
-                              {result.data.risks.exothermic_details && (
-                                <p className="text-red-600 text-xs">{result.data.risks.exothermic_details}</p>
-                              )}
+                      <p className="text-sm font-medium text-red-800 mb-3">⚠️ Risques identifiés</p>
+                      <div className="space-y-3">
+                        {result.data.risks.map((risk, i) => (
+                          <div key={i} className="p-3 bg-white rounded-lg border border-red-200">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <AlertTriangle className={`w-4 h-4 ${
+                                  risk.severity === 'critique' ? 'text-red-600' :
+                                  risk.severity === 'élevé' ? 'text-orange-600' :
+                                  risk.severity === 'modéré' ? 'text-yellow-600' : 'text-slate-500'
+                                }`} />
+                                <span className="font-medium text-slate-900">{risk.risk_type}</span>
+                              </div>
+                              <Badge className={
+                                risk.severity === 'critique' ? 'bg-red-100 text-red-700' :
+                                risk.severity === 'élevé' ? 'bg-orange-100 text-orange-700' :
+                                risk.severity === 'modéré' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-slate-100 text-slate-600'
+                              }>
+                                {risk.severity}
+                              </Badge>
                             </div>
+                            <p className="text-sm text-slate-700 mb-2">{risk.description}</p>
+                            {risk.justification && (
+                              <div className="p-2 bg-slate-50 rounded text-xs">
+                                <span className="font-medium text-slate-600">Justification: </span>
+                                <span className="text-slate-600">{risk.justification}</span>
+                              </div>
+                            )}
+                            {risk.reference && (
+                              <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                                <BookOpen className="w-3 h-3" />
+                                <span>{risk.reference.source}</span>
+                                {risk.reference.detail && <span className="text-slate-500">- {risk.reference.detail}</span>}
+                                {risk.reference.url && (
+                                  <a href={risk.reference.url} target="_blank" rel="noopener noreferrer" className="ml-1 hover:underline">
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {result.data.risks.toxic_gases?.length > 0 && (
-                          <p className="text-red-700">
-                            <span className="font-medium">Gaz toxiques:</span> {result.data.risks.toxic_gases.join(', ')}
-                          </p>
-                        )}
+                        ))}
                       </div>
                     </div>
                   )}
