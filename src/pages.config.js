@@ -9,6 +9,8 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Legal from './pages/Legal';
 import Cookies from './pages/Cookies';
+import Analysis from './pages/Analysis';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -23,9 +25,11 @@ export const PAGES = {
     "Terms": Terms,
     "Legal": Legal,
     "Cookies": Cookies,
+    "Analysis": Analysis,
 }
 
 export const pagesConfig = {
     mainPage: "Home",
     Pages: PAGES,
+    Layout: __Layout,
 };
