@@ -82,33 +82,41 @@ export default function Dashboard() {
     return false;
   };
 
-  const getUsageLimit = () => {
+  const getUsageLimit = (type = 'rampe') => {
     if (!subscription) return 0;
     if (subscription.plan === 'enterprise') return Infinity;
     if (subscription.plan === 'standard') return 100;
     if (subscription.plan === 'student') return 30;
-    if (subscription.plan === 'trial') return 10;
+    if (subscription.plan === 'trial') {
+      return type === 'simulator' ? 5 : 10;
+    }
     return 0;
   };
 
-  const getRemainingAnalyses = () => {
-    const limit = getUsageLimit();
+  const getRemainingAnalyses = (type = 'rampe') => {
+    const limit = getUsageLimit(type);
     if (limit === Infinity) return Infinity;
-    return Math.max(0, limit - (subscription?.analyses_count_this_month || 0));
+    const count = type === 'simulator' 
+      ? (subscription?.simulations_count_this_month || 0)
+      : (subscription?.analyses_count_this_month || 0);
+    return Math.max(0, limit - count);
   };
 
-  const canAnalyze = () => {
+  const canAnalyze = (type = 'rampe') => {
     if (!hasAccess()) return false;
-    const limit = getUsageLimit();
+    const limit = getUsageLimit(type);
     if (limit === Infinity) return true;
-    return (subscription?.analyses_count_this_month || 0) < limit;
+    const count = type === 'simulator' 
+      ? (subscription?.simulations_count_this_month || 0)
+      : (subscription?.analyses_count_this_month || 0);
+    return count < limit;
   };
 
-  // Fonction pour incrémenter le compteur (utilisée par RAMPE et Simulateur)
-  const incrementUsage = async () => {
+  // Fonction pour incrémenter le compteur du simulateur
+  const incrementSimulatorUsage = async () => {
     if (!subscription) return;
     await base44.entities.Subscription.update(subscription.id, {
-      analyses_count_this_month: (subscription.analyses_count_this_month || 0) + 1
+      simulations_count_this_month: (subscription.simulations_count_this_month || 0) + 1
     });
     queryClient.invalidateQueries({ queryKey: ['subscription'] });
   };
@@ -483,9 +491,9 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             className="mb-8"
           >
             <ReactionSimulator 
-              canSimulate={canAnalyze()} 
-              remainingAnalyses={getRemainingAnalyses()}
-              onSimulationComplete={incrementUsage}
+              canSimulate={canAnalyze('simulator')} 
+              remainingAnalyses={getRemainingAnalyses('simulator')}
+              onSimulationComplete={incrementSimulatorUsage}
             />
           </motion.div>
         )}
