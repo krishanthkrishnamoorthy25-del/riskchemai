@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import ReactionMechanism from './ReactionMechanism';
 import { 
   FlaskConical, 
   Dna, 
@@ -861,6 +862,16 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                           <Badge key={i} variant="outline" className="bg-white">{ppe}</Badge>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Mechanism */}
+                  {result.data.mechanism && (
+                    <div className="p-4 bg-indigo-50 rounded-lg">
+                      <p className="text-sm font-medium text-indigo-800 mb-3 flex items-center gap-2">
+                        🔄 Mécanisme réactionnel proposé
+                      </p>
+                      <ReactionMechanism mechanism={result.data.mechanism} />
                     </div>
                   )}
 
