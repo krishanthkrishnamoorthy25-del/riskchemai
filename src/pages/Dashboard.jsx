@@ -102,26 +102,46 @@ export default function Dashboard() {
     setIsAnalyzing(true);
     setAnalysisResults(null);
 
-    const prompt = `Tu es un expert en sécurité chimique et HSE. Analyse les substances chimiques suivantes et fournis pour chacune un tableau RAMPE complet.
+    const prompt = `Tu es un expert en sécurité chimique et HSE. Analyse les substances chimiques suivantes en utilisant les bases de données PubChem et ECHA.
 
 SUBSTANCES À ANALYSER:
 ${substances.map((s, i) => `${i + 1}. ${s.name}${s.cas ? ` (CAS: ${s.cas})` : ''} - Rôle: ${s.role}`).join('\n')}
 
-Pour chaque substance, fournis:
-- Le nom exact et numéro CAS (vérifié si possible)
-- Les classes de danger GHS (GHS01 à GHS09)
-- Les codes H (mentions de danger)
-- Les codes P (conseils de prudence)  
-- Un résumé du danger en 1-2 phrases
-- Les protections recommandées (EPI, ventilation, stockage, incompatibilités)
-- Un score de confiance basé sur la qualité des sources (0 à 1)
-- Les sources utilisées (PubChem, ECHA, etc.)
+POUR CHAQUE SUBSTANCE, FOURNIS OBLIGATOIREMENT:
 
-IMPORTANT: Ne fournis AUCUN protocole expérimental, quantité, procédure, température ou étape de manipulation.`;
+1. IDENTIFICATION EXACTE (recherche dans PubChem/ECHA par le numéro CAS si fourni):
+   - name: Le nom exact officiel de la substance
+   - cas: Le numéro CAS vérifié (format: XXXXX-XX-X)
+   - iupac_name: Le nom IUPAC complet
+   - molecular_formula: La formule brute (ex: H2SO4, C2H5OH, NaOH)
+   - molecular_weight: La masse molaire en g/mol (nombre décimal)
+   - synonyms: Liste des autres noms commerciaux courants (2-3 max)
+
+2. CLASSIFICATION GHS:
+   - ghs_classes: Liste des codes GHS applicables (GHS01 à GHS09)
+   - h_codes: Tous les codes H avec leur signification courte
+   - p_codes: Tous les codes P pertinents
+
+3. DANGERS:
+   - danger_summary: Résumé des dangers en 1-2 phrases claires
+
+4. PROTECTIONS:
+   - protections.epi: EPI spécifiques requis
+   - protections.ventilation: Type de ventilation nécessaire
+   - protections.stockage: Conditions de stockage
+   - protections.incompatibilites: Substances incompatibles
+
+5. MÉTA:
+   - confidence_score: Score de confiance (0.0 à 1.0) basé sur la fiabilité des sources
+   - sources: Références avec URLs vers PubChem, ECHA, etc.
+   - role: Le rôle fourni par l'utilisateur
+
+IMPORTANT: Utilise les données exactes de PubChem. Ne fournis AUCUN protocole expérimental.`;
 
     try {
       const response = await base44.integrations.Core.InvokeLLM({
         prompt,
+        add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
@@ -132,6 +152,10 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental, quantité, procédure, temp
                 properties: {
                   name: { type: "string" },
                   cas: { type: "string" },
+                  iupac_name: { type: "string" },
+                  molecular_formula: { type: "string" },
+                  molecular_weight: { type: "number" },
+                  synonyms: { type: "array", items: { type: "string" } },
                   role: { type: "string" },
                   ghs_classes: { type: "array", items: { type: "string" } },
                   h_codes: { type: "array", items: { type: "string" } },
@@ -205,16 +229,21 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental, quantité, procédure, temp
 
     // Generate export content
     if (format === 'csv') {
-      const headers = ['Nom', 'CAS', 'Rôle', 'GHS', 'Codes H', 'Codes P', 'Danger', 'EPI', 'Confiance'];
+      const headers = ['Nom', 'CAS', 'Formule', 'Masse Molaire (g/mol)', 'Rôle', 'GHS', 'Codes H', 'Codes P', 'Danger', 'EPI', 'Ventilation', 'Stockage', 'Incompatibilités', 'Confiance'];
       const rows = analysisResults.map(s => [
         s.name,
         s.cas || '',
+        s.molecular_formula || '',
+        s.molecular_weight || '',
         s.role || '',
         (s.ghs_classes || []).join('; '),
         (s.h_codes || []).join('; '),
         (s.p_codes || []).join('; '),
         s.danger_summary || '',
         s.protections?.epi || '',
+        s.protections?.ventilation || '',
+        s.protections?.stockage || '',
+        s.protections?.incompatibilites || '',
         s.confidence_score || ''
       ]);
       
