@@ -39,8 +39,8 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Fonctionnalités', page: 'Features' },
     { name: 'Tarifs', page: 'Pricing' },
-    { name: 'Sécurité', page: 'Security' },
-    { name: 'Support', page: 'Support' }
+    { name: 'Sources', page: 'Sources' },
+    { name: 'Contact', page: 'Contact' }
   ];
 
   const isLandingPage = location.pathname === '/' || location.pathname === '/Home';
