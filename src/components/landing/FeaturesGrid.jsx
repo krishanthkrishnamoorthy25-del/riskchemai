@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { 
   FlaskConical, 
   Shield, 
@@ -17,55 +19,64 @@ const features = [
     icon: FlaskConical,
     title: 'Identification automatique',
     description: 'Extraction automatique des numéros CAS, noms IUPAC et identifiants chimiques.',
-    color: 'emerald'
+    color: 'emerald',
+    link: 'Features#identification'
   },
   {
     icon: AlertTriangle,
     title: 'Classification GHS',
     description: 'Identification des pictogrammes, mentions de danger et classes de risque.',
-    color: 'orange'
+    color: 'orange',
+    link: 'Features#ghs'
   },
   {
     icon: FileText,
     title: 'Tableau RAMPE complet',
     description: 'Génération automatique conforme aux standards HSE européens.',
-    color: 'blue'
+    color: 'blue',
+    link: 'Features#rampe'
   },
   {
     icon: Shield,
     title: 'Codes H & P',
     description: 'Extraction exhaustive des mentions de danger et conseils de prudence.',
-    color: 'red'
+    color: 'red',
+    link: 'Features#codes-hp'
   },
   {
     icon: Zap,
     title: 'Analyse en < 3 secondes',
     description: 'Moteur IA optimisé pour des résultats instantanés et précis.',
-    color: 'yellow'
+    color: 'yellow',
+    link: 'Features'
   },
   {
     icon: Database,
     title: 'Sources vérifiées',
     description: 'Données issues de PubChem, ECHA et bases réglementaires officielles.',
-    color: 'purple'
+    color: 'purple',
+    link: 'Features#sources'
   },
   {
     icon: Download,
     title: 'Export PDF & CSV',
     description: 'Téléchargez vos analyses dans les formats standards de l\'industrie.',
-    color: 'cyan'
+    color: 'cyan',
+    link: 'Features#rampe'
   },
   {
     icon: Lock,
     title: 'RGPD natif',
     description: 'Aucune conservation des analyses. Vos données restent confidentielles.',
-    color: 'slate'
+    color: 'slate',
+    link: 'Security'
   },
   {
     icon: Users,
     title: 'Multi-utilisateurs',
     description: 'Plan Entreprise avec gestion d\'équipe et accès API dédié.',
-    color: 'pink'
+    color: 'pink',
+    link: 'Pricing'
   }
 ];
 
@@ -102,24 +113,28 @@ export default function FeaturesGrid() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <motion.div
+            <Link 
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group p-6 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all duration-300 bg-white"
+              to={createPageUrl(feature.link)}
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${colorClasses[feature.color]}`}>
-                <feature.icon className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-slate-600 leading-relaxed">
-                {feature.description}
-              </p>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group p-6 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all duration-300 bg-white cursor-pointer h-full"
+              >
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${colorClasses[feature.color]}`}>
+                  <feature.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>
