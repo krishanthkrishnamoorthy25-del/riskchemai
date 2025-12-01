@@ -23,6 +23,7 @@ import Footer from '@/components/landing/Footer';
 
 const mainFeatures = [
   {
+    id: 'identification',
     icon: FlaskConical,
     title: 'Identification automatique des substances',
     description: 'Notre moteur IA extrait automatiquement les numéros CAS, noms IUPAC et identifiants chimiques à partir des noms commerciaux ou formules.',
@@ -33,6 +34,7 @@ const mainFeatures = [
     ]
   },
   {
+    id: 'ghs',
     icon: AlertTriangle,
     title: 'Classification GHS complète',
     description: 'Identification automatique des pictogrammes de danger, mentions de danger et classes de risque selon le règlement CLP.',
@@ -43,6 +45,7 @@ const mainFeatures = [
     ]
   },
   {
+    id: 'rampe',
     icon: FileText,
     title: 'Tableau RAMPE automatique',
     description: 'Génération instantanée de tableaux RAMPE conformes aux standards HSE français et européens pour vos évaluations des risques.',
@@ -53,6 +56,7 @@ const mainFeatures = [
     ]
   },
   {
+    id: 'codes-hp',
     icon: Shield,
     title: 'Codes H & P exhaustifs',
     description: 'Extraction complète des mentions de danger (H) et conseils de prudence (P) pour chaque substance identifiée.',
@@ -63,6 +67,7 @@ const mainFeatures = [
     ]
   },
   {
+    id: 'epi',
     icon: Cpu,
     title: 'Recommandations EPI intelligentes',
     description: 'Suggestions automatiques d\'équipements de protection individuelle adaptés aux dangers identifiés.',
@@ -73,6 +78,7 @@ const mainFeatures = [
     ]
   },
   {
+    id: 'sources',
     icon: Database,
     title: 'Sources vérifiées et traçables',
     description: 'Toutes les données proviennent de bases réglementaires officielles avec traçabilité complète.',
@@ -158,11 +164,12 @@ export default function Features() {
             {mainFeatures.map((feature, index) => (
               <motion.div
                 key={feature.title}
+                id={feature.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center`}
+                className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center scroll-mt-24`}
               >
                 <div className="flex-1">
                   <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-6">
