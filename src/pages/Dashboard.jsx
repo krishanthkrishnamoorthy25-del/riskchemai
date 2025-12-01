@@ -481,7 +481,11 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <ReactionSimulator />
+            <ReactionSimulator 
+              canSimulate={canAnalyze()} 
+              remainingAnalyses={getRemainingAnalyses()}
+              onSimulationComplete={incrementUsage}
+            />
           </motion.div>
         )}
 
