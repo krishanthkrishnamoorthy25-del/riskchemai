@@ -86,8 +86,14 @@ export default function Dashboard() {
     if (!subscription) return 0;
     if (subscription.plan === 'enterprise') return Infinity;
     if (subscription.plan === 'standard') return 100;
-    if (subscription.plan === 'trial') return 10;
+    if (subscription.plan === 'trial') return 10; // 10 analyses TOTAL (RAMPE + Simulateur)
     return 0;
+  };
+
+  const getRemainingAnalyses = () => {
+    const limit = getUsageLimit();
+    if (limit === Infinity) return Infinity;
+    return Math.max(0, limit - (subscription?.analyses_count_this_month || 0));
   };
 
   const canAnalyze = () => {
@@ -95,6 +101,15 @@ export default function Dashboard() {
     const limit = getUsageLimit();
     if (limit === Infinity) return true;
     return (subscription?.analyses_count_this_month || 0) < limit;
+  };
+
+  // Fonction pour incrémenter le compteur (utilisée par RAMPE et Simulateur)
+  const incrementUsage = async () => {
+    if (!subscription) return;
+    await base44.entities.Subscription.update(subscription.id, {
+      analyses_count_this_month: (subscription.analyses_count_this_month || 0) + 1
+    });
+    queryClient.invalidateQueries({ queryKey: ['subscription'] });
   };
 
   // Run analysis
