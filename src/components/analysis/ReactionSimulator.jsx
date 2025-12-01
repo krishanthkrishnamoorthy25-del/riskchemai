@@ -129,13 +129,21 @@ FOURNIS:
    - Justification chimique/thermodynamique (avec données: ΔH, pKa, potentiel redox si pertinent)
    - SOURCE qui documente ce risque (FDS, INRS, publication)
 
-6. RÉFÉRENCES BIBLIOGRAPHIQUES OBLIGATOIRES:
+6. MÉCANISME RÉACTIONNEL PROPOSÉ - BASÉ SUR LA LITTÉRATURE:
+   Propose un mécanisme étape par étape avec:
+   - Type de mécanisme (SN1, SN2, E1, E2, addition, Diels-Alder, etc.)
+   - Pour chaque étape: structures des espèces impliquées, mouvement des électrons
+   - Étape limitante (rate-determining step)
+   - Stéréochimie si applicable
+   - SOURCE qui documente ce mécanisme
+
+7. RÉFÉRENCES BIBLIOGRAPHIQUES OBLIGATOIRES:
    Pour chaque affirmation importante, cite:
    - Auteurs, Titre, Journal, Année, DOI
    - Ou: Base de données (PubChem CID, ECHA, Sigma-Aldrich)
    
-NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.
-Si une information n'est pas documentée, dis-le explicitement.`;
+AVERTISSEMENT: Le mécanisme est une PROPOSITION à vérifier par un chimiste qualifié.
+NE FOURNIS QUE DES INFORMATIONS VÉRIFIABLES DANS LA LITTÉRATURE.`;
 
     try {
       const response = await base44.integrations.Core.InvokeLLM({
