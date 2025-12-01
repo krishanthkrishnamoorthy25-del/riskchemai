@@ -14,6 +14,7 @@ import {
   FileText
 } from 'lucide-react';
 import { GHSPictogramRow } from './GHSPictograms';
+import QuickSearch from './QuickSearch';
 
 function ConfidenceScore({ score }) {
   const percentage = Math.round(score * 100);
@@ -230,28 +231,36 @@ function SubstanceCard({ substance, index }) {
   );
 }
 
-export default function RampeTable({ results, onExport }) {
+export default function RampeTable({ results, onExport, onQuickSearch, isSearching }) {
   if (!results || results.length === 0) return null;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Tableau RAMPE</h2>
           <p className="text-sm text-slate-500">
             {results.length} substance{results.length > 1 ? 's' : ''} analysée{results.length > 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => onExport('csv')} className="gap-2">
-            <Download className="w-4 h-4" />
-            CSV
-          </Button>
-          <Button variant="outline" onClick={() => onExport('pdf')} className="gap-2">
-            <Download className="w-4 h-4" />
-            PDF
-          </Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Quick Search */}
+          {onQuickSearch && (
+            <div className="w-full sm:w-64">
+              <QuickSearch onSearch={onQuickSearch} isLoading={isSearching} />
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onExport('csv')} className="gap-2">
+              <Download className="w-4 h-4" />
+              CSV
+            </Button>
+            <Button variant="outline" onClick={() => onExport('pdf')} className="gap-2">
+              <Download className="w-4 h-4" />
+              PDF
+            </Button>
+          </div>
         </div>
       </div>
 
