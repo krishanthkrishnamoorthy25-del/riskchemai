@@ -10,18 +10,20 @@ export default function Footer() {
     product: [
       { name: 'Fonctionnalités', page: 'Features' },
       { name: 'Tarifs', page: 'Pricing' },
-      { name: 'Dashboard', page: 'Dashboard' }
+      { name: 'Dashboard', page: 'Dashboard' },
+      { name: 'Sources scientifiques', page: 'Sources' }
     ],
     legal: [
       { name: 'Mentions légales', page: 'Legal' },
       { name: 'Politique de confidentialité', page: 'Privacy' },
       { name: 'Cookies', page: 'Cookies' },
-      { name: 'CGU', page: 'Terms' }
+      { name: 'CGU', page: 'Terms' },
+      { name: 'Avertissements', page: 'Disclaimer' }
     ],
     support: [
       { name: 'Centre d\'aide', page: 'Support' },
       { name: 'Sécurité', page: 'Security' },
-      { name: 'Contact', page: 'Support' }
+      { name: 'Contact', page: 'Contact' }
     ]
   };
 
