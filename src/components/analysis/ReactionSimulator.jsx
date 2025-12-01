@@ -31,7 +31,7 @@ import {
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function ReactionSimulator() {
+export default function ReactionSimulator({ canSimulate = true, remainingAnalyses = Infinity, onSimulationComplete }) {
   const [activeTab, setActiveTab] = useState('chemistry');
   const [isSimulating, setIsSimulating] = useState(false);
   const [result, setResult] = useState(null);
@@ -76,7 +76,8 @@ export default function ReactionSimulator() {
   const simulateChemistry = async (withConditions = false) => {
     const validReactants = reactants.filter(r => r.name.trim() || r.cas.trim());
     if (validReactants.length === 0) return;
-    
+    if (!canSimulate) return;
+
     setIsSimulating(true);
     setResult(null);
     setNeedsConditions(false);
@@ -362,16 +363,22 @@ NE FOURNIS QUE DES INFORMATIONS DES SOURCES AUTORISÉES.`;
       } else {
         setResult({ type: 'chemistry', data: response });
       }
-    } catch (error) {
+
+      // Incrémenter le compteur d'utilisation
+      if (onSimulationComplete) {
+        await onSimulationComplete();
+      }
+      } catch (error) {
       console.error('Simulation error:', error);
-    } finally {
+      } finally {
       setIsSimulating(false);
-    }
-  };
+      }
+      };
 
   const simulateBiotech = async () => {
     if (!organism.trim() && !process.trim()) return;
-    
+    if (!canSimulate) return;
+
     setIsSimulating(true);
     setResult(null);
 
@@ -472,12 +479,17 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
       });
 
       setResult({ type: 'biotech', data: response });
-    } catch (error) {
+
+      // Incrémenter le compteur d'utilisation
+      if (onSimulationComplete) {
+        await onSimulationComplete();
+      }
+      } catch (error) {
       console.error('Simulation error:', error);
-    } finally {
+      } finally {
       setIsSimulating(false);
-    }
-  };
+      }
+      };
 
   const getDangerColor = (level) => {
     switch(level) {
