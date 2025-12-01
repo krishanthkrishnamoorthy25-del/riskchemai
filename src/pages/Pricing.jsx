@@ -37,8 +37,32 @@ const plans = [
     highlight: false
   },
   {
+    name: 'Étudiant',
+    price: '9,99€',
+    period: '/mois HT',
+    description: 'Tarif réduit pour étudiants et doctorants',
+    features: [
+      '30 analyses / mois',
+      'Tableau RAMPE complet',
+      'Export PDF & CSV',
+      'Tous les codes H & P',
+      'Recommandations EPI',
+      'Score de confiance',
+      'Support par email'
+    ],
+    notIncluded: [
+      'Multi-utilisateurs',
+      'Accès API',
+      'Support prioritaire'
+    ],
+    cta: 'Choisir Étudiant',
+    popular: false,
+    highlight: false,
+    badge: '🎓 -66%'
+  },
+  {
     name: 'Standard',
-    price: '29€',
+    price: '29,99€',
     period: '/mois HT',
     description: 'Pour les professionnels HSE et laboratoires',
     features: [
@@ -61,7 +85,7 @@ const plans = [
   },
   {
     name: 'Entreprise',
-    price: '89€',
+    price: '89,99€',
     period: '/mois HT',
     description: 'Pour les équipes et grandes organisations',
     features: [
@@ -132,8 +156,8 @@ export default function Pricing() {
 
       {/* Pricing Cards */}
       <section className="py-16 -mt-8">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
@@ -151,6 +175,13 @@ export default function Pricing() {
                     <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full bg-emerald-500 text-white text-sm font-medium shadow-lg shadow-emerald-500/30">
                       <Sparkles className="w-4 h-4" />
                       Plus populaire
+                    </span>
+                  </div>
+                )}
+                {plan.badge && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full bg-blue-500 text-white text-sm font-medium shadow-lg shadow-blue-500/30">
+                      {plan.badge}
                     </span>
                   </div>
                 )}
