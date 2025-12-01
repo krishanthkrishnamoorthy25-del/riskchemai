@@ -10,6 +10,10 @@ import Terms from './pages/Terms';
 import Legal from './pages/Legal';
 import Cookies from './pages/Cookies';
 import Analysis from './pages/Analysis';
+import Sources from './pages/Sources';
+import Disclaimer from './pages/Disclaimer';
+import Contact from './pages/Contact';
+import Admin from './pages/Admin';
 import __Layout from './Layout.jsx';
 
 
@@ -26,6 +30,10 @@ export const PAGES = {
     "Legal": Legal,
     "Cookies": Cookies,
     "Analysis": Analysis,
+    "Sources": Sources,
+    "Disclaimer": Disclaimer,
+    "Contact": Contact,
+    "Admin": Admin,
 }
 
 export const pagesConfig = {
