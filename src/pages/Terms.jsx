@@ -102,6 +102,59 @@ export default function Terms() {
             L'utilisateur dispose d'un droit d'usage non exclusif et non transférable pour son usage professionnel.
           </p>
 
+          <h2>6bis. Sources de données et licences</h2>
+          <h3>6bis.1 Sources autorisées (Plan Standard)</h3>
+          <p>
+            Le Service utilise exclusivement des sources de données publiques et librement accessibles :
+          </p>
+          <ul>
+            <li><strong>PubChem</strong> (NIH/NCBI) - Licence domaine public</li>
+            <li><strong>ECHA</strong> (Agence Européenne des Produits Chimiques) - Données publiques</li>
+            <li><strong>ORD</strong> (Open Reaction Database) - Licence CC-BY</li>
+            <li><strong>CompTox</strong> (EPA) - Données publiques</li>
+            <li><strong>Europe PMC</strong> - Publications en accès libre</li>
+          </ul>
+
+          <h3>6bis.2 Sources premium (Plan Entreprise)</h3>
+          <p>
+            Les clients Entreprise peuvent bénéficier d'un accès étendu à des bases de données sous licence :
+          </p>
+          <ul>
+            <li>Reaxys (Elsevier)</li>
+            <li>SciFinder (CAS)</li>
+            <li>Bases éditeurs (ACS, RSC, Wiley)</li>
+          </ul>
+          <p>
+            L'activation de ces sources nécessite des accords de licence spécifiques et 
+            peut entraîner des frais supplémentaires.
+          </p>
+
+          <h3>6bis.3 Clause TDM (Text and Data Mining)</h3>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 my-6">
+            <h4 className="text-blue-800 mt-0">Réservation de droits TDM</h4>
+            <p className="text-blue-700 mb-0">
+              Conformément à l'article L. 122-5-3 du Code de la propriété intellectuelle (transposition 
+              Directive UE 2019/790), ChemRisk Pro se réserve le droit d'effectuer des opérations de 
+              fouille de textes et de données (TDM) sur les contenus accessibles, dans le respect des 
+              conditions d'utilisation des éditeurs et bases de données sources.
+              <br /><br />
+              Pour les sources sous licence éditeur (Plan Entreprise), les droits TDM sont soumis aux 
+              accords de licence spécifiques négociés avec chaque éditeur.
+            </p>
+          </div>
+
+          <h3>6bis.4 Score de provenance</h3>
+          <p>
+            Chaque analyse inclut un "Score de Provenance" (0-100) indiquant la fiabilité des 
+            données basée sur les sources utilisées :
+          </p>
+          <ul>
+            <li><strong>80-100 :</strong> Données expérimentales vérifiées (ORD, ECHA)</li>
+            <li><strong>60-79 :</strong> Référencé dans PubChem avec sources primaires</li>
+            <li><strong>40-59 :</strong> Données calculées/prédites (CompTox)</li>
+            <li><strong>0-39 :</strong> Sources limitées - vérification recommandée</li>
+          </ul>
+
           <h2>7. Données personnelles</h2>
           <p>
             Le traitement des données personnelles est régi par notre Politique de Confidentialité. 
