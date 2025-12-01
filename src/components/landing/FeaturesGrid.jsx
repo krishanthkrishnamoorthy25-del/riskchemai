@@ -1,0 +1,128 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { 
+  FlaskConical, 
+  Shield, 
+  FileText, 
+  Zap, 
+  Database, 
+  Lock,
+  AlertTriangle,
+  Download,
+  Users
+} from 'lucide-react';
+
+const features = [
+  {
+    icon: FlaskConical,
+    title: 'Identification automatique',
+    description: 'Extraction automatique des numéros CAS, noms IUPAC et identifiants chimiques.',
+    color: 'emerald'
+  },
+  {
+    icon: AlertTriangle,
+    title: 'Classification GHS',
+    description: 'Identification des pictogrammes, mentions de danger et classes de risque.',
+    color: 'orange'
+  },
+  {
+    icon: FileText,
+    title: 'Tableau RAMPE complet',
+    description: 'Génération automatique conforme aux standards HSE européens.',
+    color: 'blue'
+  },
+  {
+    icon: Shield,
+    title: 'Codes H & P',
+    description: 'Extraction exhaustive des mentions de danger et conseils de prudence.',
+    color: 'red'
+  },
+  {
+    icon: Zap,
+    title: 'Analyse en < 3 secondes',
+    description: 'Moteur IA optimisé pour des résultats instantanés et précis.',
+    color: 'yellow'
+  },
+  {
+    icon: Database,
+    title: 'Sources vérifiées',
+    description: 'Données issues de PubChem, ECHA et bases réglementaires officielles.',
+    color: 'purple'
+  },
+  {
+    icon: Download,
+    title: 'Export PDF & CSV',
+    description: 'Téléchargez vos analyses dans les formats standards de l\'industrie.',
+    color: 'cyan'
+  },
+  {
+    icon: Lock,
+    title: 'RGPD natif',
+    description: 'Aucune conservation des analyses. Vos données restent confidentielles.',
+    color: 'slate'
+  },
+  {
+    icon: Users,
+    title: 'Multi-utilisateurs',
+    description: 'Plan Entreprise avec gestion d\'équipe et accès API dédié.',
+    color: 'pink'
+  }
+];
+
+const colorClasses = {
+  emerald: 'bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white',
+  orange: 'bg-orange-500/10 text-orange-500 group-hover:bg-orange-500 group-hover:text-white',
+  blue: 'bg-blue-500/10 text-blue-500 group-hover:bg-blue-500 group-hover:text-white',
+  red: 'bg-red-500/10 text-red-500 group-hover:bg-red-500 group-hover:text-white',
+  yellow: 'bg-yellow-500/10 text-yellow-500 group-hover:bg-yellow-500 group-hover:text-white',
+  purple: 'bg-purple-500/10 text-purple-500 group-hover:bg-purple-500 group-hover:text-white',
+  cyan: 'bg-cyan-500/10 text-cyan-500 group-hover:bg-cyan-500 group-hover:text-white',
+  slate: 'bg-slate-500/10 text-slate-500 group-hover:bg-slate-500 group-hover:text-white',
+  pink: 'bg-pink-500/10 text-pink-500 group-hover:bg-pink-500 group-hover:text-white'
+};
+
+export default function FeaturesGrid() {
+  return (
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+            Tout pour l'analyse de risques chimiques
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Une plateforme complète qui automatise vos évaluations HSE 
+            tout en respectant les normes les plus strictes.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="group p-6 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all duration-300 bg-white"
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${colorClasses[feature.color]}`}>
+                <feature.icon className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-slate-600 leading-relaxed">
+                {feature.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
