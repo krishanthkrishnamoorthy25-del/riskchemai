@@ -199,9 +199,23 @@ export default function Terms() {
             sous réserve des règles impératives de compétence au profit des consommateurs.
           </p>
 
-          <h2>12. Contact</h2>
+          <h2>12. Architecture et évolutivité</h2>
+          <p>
+            Le Service est conçu avec une architecture modulaire ("plug-in") permettant l'intégration 
+            future de sources de données supplémentaires. Cette architecture garantit :
+          </p>
+          <ul>
+            <li>La traçabilité de chaque donnée vers sa source</li>
+            <li>La non-conservation des requêtes d'analyse (conformité RGPD)</li>
+            <li>L'évolutivité vers des sources premium pour les clients Entreprise</li>
+          </ul>
+
+          <h2>13. Contact</h2>
           <p>
             Pour toute question : support@chemriskpro.com
+          </p>
+          <p>
+            Pour les demandes de licences Entreprise : enterprise@chemriskpro.com
           </p>
         </div>
       </section>
