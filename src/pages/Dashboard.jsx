@@ -13,12 +13,14 @@ import SubscriptionCard from '@/components/dashboard/SubscriptionCard';
 import AnalysisHistory from '@/components/dashboard/AnalysisHistory';
 import ChemicalAnalysisForm from '@/components/analysis/ChemicalAnalysisForm';
 import RampeTable from '@/components/analysis/RampeTable';
+import ReactionSimulator from '@/components/analysis/ReactionSimulator';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [showAnalysisForm, setShowAnalysisForm] = useState(false);
   const [analysisResults, setAnalysisResults] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isQuickSearching, setIsQuickSearching] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -214,6 +216,83 @@ IMPORTANT: Utilise les données exactes de PubChem. Ne fournis AUCUN protocole e
     }
   };
 
+  // Quick search to add substance to existing results
+  const handleQuickSearch = async (query) => {
+    if (!canAnalyze()) return;
+    
+    setIsQuickSearching(true);
+
+    const prompt = `Tu es un expert en sécurité chimique. Analyse cette substance en utilisant PubChem et ECHA:
+
+SUBSTANCE: ${query}
+
+FOURNIS L'IDENTIFICATION EXACTE ET LES RISQUES (même format que précédemment):
+- name, cas, iupac_name, molecular_formula, molecular_weight, synonyms
+- ghs_classes, h_codes, p_codes, danger_summary
+- protections (epi, ventilation, stockage, incompatibilites)
+- confidence_score, sources
+
+IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
+
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            cas: { type: "string" },
+            iupac_name: { type: "string" },
+            molecular_formula: { type: "string" },
+            molecular_weight: { type: "number" },
+            synonyms: { type: "array", items: { type: "string" } },
+            role: { type: "string" },
+            ghs_classes: { type: "array", items: { type: "string" } },
+            h_codes: { type: "array", items: { type: "string" } },
+            p_codes: { type: "array", items: { type: "string" } },
+            danger_summary: { type: "string" },
+            protections: {
+              type: "object",
+              properties: {
+                epi: { type: "string" },
+                ventilation: { type: "string" },
+                stockage: { type: "string" },
+                incompatibilites: { type: "string" }
+              }
+            },
+            confidence_score: { type: "number" },
+            sources: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  url: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Add to existing results
+      const newSubstance = { ...response, role: 'Recherche rapide' };
+      setAnalysisResults(prev => prev ? [...prev, newSubstance] : [newSubstance]);
+
+      // Update usage
+      await base44.entities.Subscription.update(subscription.id, {
+        analyses_count_this_month: (subscription.analyses_count_this_month || 0) + 1
+      });
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+
+    } catch (error) {
+      console.error('Quick search error:', error);
+    } finally {
+      setIsQuickSearching(false);
+    }
+  };
+
   const handleExport = async (format) => {
     if (!analysisResults) return;
     
@@ -371,7 +450,23 @@ IMPORTANT: Utilise les données exactes de PubChem. Ne fournis AUCUN protocole e
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <RampeTable results={analysisResults} onExport={handleExport} />
+            <RampeTable 
+              results={analysisResults} 
+              onExport={handleExport}
+              onQuickSearch={canAnalyze() ? handleQuickSearch : null}
+              isSearching={isQuickSearching}
+            />
+          </motion.div>
+        )}
+
+        {/* Reaction Simulator */}
+        {hasAccess() && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <ReactionSimulator />
           </motion.div>
         )}
 
