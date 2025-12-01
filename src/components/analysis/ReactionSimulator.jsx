@@ -22,7 +22,8 @@ import {
   ExternalLink,
   HelpCircle,
   Snowflake,
-  Flame
+  Flame,
+  CheckCircle2
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
