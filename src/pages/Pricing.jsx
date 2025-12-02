@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -15,7 +15,8 @@ import Footer from '@/components/landing/Footer';
 const plans = [
   {
     name: 'Essai Gratuit',
-    price: '0€',
+    priceMonthly: '0€',
+    priceAnnual: '0€',
     period: '7 jours',
     description: 'Découvrez toutes les fonctionnalités sans engagement',
     features: [
@@ -27,7 +28,7 @@ const plans = [
       'Recommandations EPI'
     ],
     notIncluded: [
-      'Export CSV',
+      'Analyses illimitées',
       'Support prioritaire',
       'Multi-utilisateurs',
       'Accès API'
@@ -38,71 +39,76 @@ const plans = [
   },
   {
     name: 'Étudiant',
-    price: '9,99€',
+    priceMonthly: '9,90€',
+    priceAnnual: '7,90€',
+    annualTotal: '95€',
     period: '/mois HT',
-    description: 'Tarif réduit pour étudiants et doctorants',
+    description: 'Étudiants, écoles & laboratoires pédagogiques',
     features: [
-      '30 analyses / mois',
+      '200 analyses / mois',
+      'Analyse IA complète des réactions',
       'Tableau RAMPE complet',
-      'Export PDF & CSV',
-      'Tous les codes H & P',
-      'Recommandations EPI',
+      'Codes H/P et pictogrammes GHS',
+      'Export PDF',
       'Score de confiance',
       'Support par email'
     ],
     notIncluded: [
-      'Multi-utilisateurs',
+      'Analyses illimitées',
       'Accès API',
       'Support prioritaire'
     ],
     cta: 'Choisir Étudiant',
     popular: false,
     highlight: false,
-    badge: '🎓 -66%'
+    badge: '🎓 Éducation'
   },
   {
-    name: 'Standard',
-    price: '29,99€',
+    name: 'PME / Artisans',
+    priceMonthly: '49€',
+    priceAnnual: '39€',
+    annualTotal: '470€',
     period: '/mois HT',
-    description: 'Pour les professionnels HSE et laboratoires',
+    description: 'PME, artisans & laboratoires privés',
     features: [
-      '100 analyses / mois',
-      'Tableau RAMPE complet',
-      'Export PDF & CSV',
-      'Tous les codes H & P',
-      'Recommandations EPI détaillées',
-      'Incompatibilités chimiques',
-      'Support prioritaire par email',
-      'Historique des métadonnées'
+      'Analyses illimitées',
+      'Tout l\'abonnement Étudiant',
+      'Score de fiabilité IA avancé',
+      'Recommandations EPI optimisées',
+      'Historique PDF 12 mois',
+      'Clé API (si besoin)',
+      'Support prioritaire'
     ],
     notIncluded: [
-      'Multi-utilisateurs',
-      'Accès API'
+      'Multi-équipes',
+      'Connecteurs personnalisés'
     ],
-    cta: 'Choisir Standard',
+    cta: 'Choisir PME',
     popular: true,
     highlight: true
   },
   {
     name: 'Entreprise',
-    price: '89,99€',
+    priceMonthly: '199€',
+    priceAnnual: '159€',
+    annualTotal: '1 900€',
     period: '/mois HT',
-    description: 'Pour les équipes et grandes organisations',
+    description: 'Grandes entreprises & industries chimiques',
     features: [
-      'Analyses illimitées',
-      'Multi-utilisateurs (5 max)',
-      'Accès API REST',
-      'Tableau RAMPE avancé',
-      'Tous les exports',
-      'Intégrations personnalisées',
-      'Support dédié 24/7',
-      'SLA garanti 99.9%',
-      'Formation incluse'
+      'Tout l\'abonnement PME',
+      'SLA garanti 99,9%',
+      'Multi-équipes (10 utilisateurs inclus)',
+      'Connecteurs personnalisés',
+      'Validation expert interne',
+      'Logging de conformité RGPD',
+      'Support entreprise + onboarding',
+      'Priorité de calcul IA'
     ],
     notIncluded: [],
     cta: 'Contacter les ventes',
     popular: false,
-    highlight: false
+    highlight: false,
+    badge: '🏭 Industries'
   }
 ];
 
@@ -134,6 +140,8 @@ const faqs = [
 ];
 
 export default function Pricing() {
+  const [isAnnual, setIsAnnual] = useState(true);
+
   return (
     <div className="min-h-screen bg-white pt-20">
       {/* Header */}
@@ -146,10 +154,37 @@ export default function Pricing() {
             <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
               Tarifs simples et transparents
             </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
               Choisissez le plan adapté à vos besoins. 
               Commencez gratuitement, évoluez selon votre usage.
             </p>
+            
+            {/* Toggle Mensuel / Annuel */}
+            <div className="inline-flex items-center gap-4 p-1.5 bg-slate-100 rounded-xl">
+              <button
+                onClick={() => setIsAnnual(false)}
+                className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  !isAnnual 
+                    ? 'bg-white text-slate-900 shadow-sm' 
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Mensuel
+              </button>
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  isAnnual 
+                    ? 'bg-white text-slate-900 shadow-sm' 
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Annuel
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                  -20%
+                </span>
+              </button>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -191,13 +226,18 @@ export default function Pricing() {
                     {plan.name}
                   </h3>
                   <div className="flex items-baseline gap-1">
-                    <span className={`text-5xl font-bold ${plan.highlight ? 'text-white' : 'text-slate-900'}`}>
-                      {plan.price}
-                    </span>
-                    <span className={plan.highlight ? 'text-slate-400' : 'text-slate-500'}>
-                      {plan.period}
-                    </span>
-                  </div>
+                      <span className={`text-5xl font-bold ${plan.highlight ? 'text-white' : 'text-slate-900'}`}>
+                        {isAnnual ? plan.priceAnnual : plan.priceMonthly}
+                      </span>
+                      <span className={plan.highlight ? 'text-slate-400' : 'text-slate-500'}>
+                        {plan.period}
+                      </span>
+                    </div>
+                    {isAnnual && plan.annualTotal && (
+                      <p className={`text-sm mt-1 ${plan.highlight ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                        Facturé {plan.annualTotal}/an
+                      </p>
+                    )}
                   <p className={`mt-3 ${plan.highlight ? 'text-slate-400' : 'text-slate-600'}`}>
                     {plan.description}
                   </p>
