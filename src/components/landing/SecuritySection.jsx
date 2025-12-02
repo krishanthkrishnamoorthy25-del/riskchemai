@@ -59,7 +59,7 @@ export default function SecuritySection() {
             Vos données sont sacrées
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            ChemRisk Pro a été conçu avec la confidentialité au cœur de son architecture. 
+            ChemRisk AI a été conçu avec la confidentialité au cœur de son architecture. 
             Nous ne stockons jamais vos analyses chimiques.
           </p>
         </motion.div>
@@ -94,7 +94,7 @@ export default function SecuritySection() {
           className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-slate-700 text-center"
         >
           <p className="text-slate-300 text-lg">
-            <strong className="text-white">Important :</strong> ChemRisk Pro est un outil d'aide à l'identification des risques. 
+            <strong className="text-white">Important :</strong> ChemRisk AI est un outil d'aide à l'identification des risques. 
             Toutes les informations doivent être vérifiées par un responsable HSE qualifié.
           </p>
         </motion.div>

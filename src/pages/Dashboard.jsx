@@ -406,7 +406,7 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             <h1 className="text-2xl font-bold text-slate-900">
               Bonjour, {user.full_name || 'Utilisateur'}
             </h1>
-            <p className="text-slate-500">Bienvenue sur votre tableau de bord ChemRisk Pro</p>
+            <p className="text-slate-500">Bienvenue sur votre tableau de bord ChemRisk AI</p>
           </div>
           <div className="flex items-center gap-3">
             <GlobalSearch onAction={handleShortcut} />
@@ -452,7 +452,7 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
                 <h3 className="font-semibold text-amber-900">Accès limité</h3>
                 <p className="text-amber-800 mt-1">
                   Votre période d'essai est terminée ou votre abonnement est inactif. 
-                  Passez à un plan payant pour continuer à utiliser ChemRisk Pro.
+                  Passez à un plan payant pour continuer à utiliser ChemRisk AI.
                 </p>
                 <Link to={createPageUrl('Pricing')}>
                   <Button className="mt-4 bg-amber-600 hover:bg-amber-700">

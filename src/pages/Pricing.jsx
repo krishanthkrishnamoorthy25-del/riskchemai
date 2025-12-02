@@ -127,7 +127,7 @@ const faqs = [
   },
   {
     question: "Quelles sont les sources de données utilisées ?",
-    answer: "ChemRisk Pro utilise des données provenant de sources officielles comme PubChem (NIH), l'ECHA et les bases réglementaires GHS. Chaque analyse inclut un score de confiance et les références des sources."
+    answer: "ChemRisk AI utilise des données provenant de sources officielles comme PubChem (NIH), l'ECHA et les bases réglementaires GHS. Chaque analyse inclut un score de confiance et les références des sources."
   },
   {
     question: "L'API est-elle disponible avec le plan Standard ?",
@@ -318,7 +318,7 @@ export default function Pricing() {
       <section className="py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">
-            Prêt à essayer ChemRisk Pro ?
+            Prêt à essayer ChemRisk AI ?
           </h2>
           <p className="text-lg text-slate-600 mb-8">
             Commencez votre essai gratuit de 7 jours dès maintenant. 
