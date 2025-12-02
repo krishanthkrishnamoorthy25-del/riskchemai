@@ -349,9 +349,9 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
         }
       });
 
-      // Add to existing results
-      const newSubstance = { ...response, role: 'Recherche rapide' };
-      setAnalysisResults(prev => prev ? [...prev, newSubstance] : [newSubstance]);
+      // Replace existing results with new search
+                  const newSubstance = { ...response, role: 'Recherche rapide' };
+                  setAnalysisResults([newSubstance]);
 
       // Update usage
       await base44.entities.Subscription.update(subscription.id, {
