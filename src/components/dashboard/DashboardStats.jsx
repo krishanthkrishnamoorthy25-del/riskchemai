@@ -1,29 +1,42 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FlaskConical, Calendar, TrendingUp, Clock } from 'lucide-react';
+import { FlaskConical, Calendar, TrendingUp, Clock, Zap } from 'lucide-react';
 
-export default function DashboardStats({ subscription, analysisLogs }) {
+export default function DashboardStats({ subscription, analysisLogs, simulationsCount = 0 }) {
+  const plan = subscription?.plan || 'trial';
+  const analysesCount = subscription?.analyses_count_this_month || 0;
+  const simsCount = subscription?.simulations_count_this_month || simulationsCount || 0;
+
+  // Limites selon le plan
+  const getLimits = () => {
+    if (plan === 'enterprise') return { rampe: Infinity, simulations: Infinity };
+    if (plan === 'standard') return { rampe: 100, simulations: 100 };
+    if (plan === 'student') return { rampe: 30, simulations: 30 };
+    return { rampe: 10, simulations: 5 }; // trial
+  };
+
+  const limits = getLimits();
+
   const stats = [
     {
       label: 'Plan actuel',
-      value: subscription?.plan === 'trial' ? 'Essai gratuit' : 
-             subscription?.plan === 'standard' ? 'Standard' : 
-             subscription?.plan === 'enterprise' ? 'Entreprise' : 'Aucun',
+      value: plan === 'trial' ? 'Essai gratuit' : 
+             plan === 'student' ? 'Étudiant' :
+             plan === 'standard' ? 'Standard' : 
+             plan === 'enterprise' ? 'Entreprise' : 'Aucun',
       icon: Calendar,
       color: 'bg-emerald-500'
     },
     {
-      label: 'Analyses ce mois',
-      value: subscription?.analyses_count_this_month || 0,
+      label: 'Analyses RAMPE',
+      value: limits.rampe === Infinity ? `${analysesCount}` : `${analysesCount}/${limits.rampe}`,
       icon: FlaskConical,
       color: 'bg-blue-500'
     },
     {
-      label: 'Limite mensuelle',
-      value: subscription?.plan === 'enterprise' ? '∞' : 
-             subscription?.plan === 'standard' ? '100' : 
-             subscription?.plan === 'trial' ? '10' : '0',
-      icon: TrendingUp,
+      label: 'Simulations',
+      value: limits.simulations === Infinity ? `${simsCount}` : `${simsCount}/${limits.simulations}`,
+      icon: Zap,
       color: 'bg-purple-500'
     },
     {
