@@ -48,7 +48,7 @@ const logos = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white dark:bg-slate-900 transition-colors">
       <div className="max-w-7xl mx-auto px-6">
         {/* Logos */}
         <motion.div
@@ -80,11 +80,11 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
             Ce que disent nos utilisateurs
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Plus de 500 professionnels utilisent ChemRisk Pro quotidiennement
+          <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            Des professionnels nous font confiance au quotidien
           </p>
         </motion.div>
 
@@ -97,9 +97,9 @@ export default function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-slate-50 rounded-2xl p-8 relative"
+              className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-8 relative"
             >
-              <Quote className="absolute top-6 right-6 w-10 h-10 text-slate-200" />
+              <Quote className="absolute top-6 right-6 w-10 h-10 text-slate-200 dark:text-slate-700" />
               
               {/* Rating */}
               <div className="flex gap-1 mb-4">
@@ -109,7 +109,7 @@ export default function TestimonialsSection() {
               </div>
 
               {/* Content */}
-              <p className="text-slate-700 text-lg leading-relaxed mb-6">
+              <p className="text-slate-700 dark:text-slate-200 text-lg leading-relaxed mb-6">
                 "{testimonial.content}"
               </p>
 
@@ -121,8 +121,8 @@ export default function TestimonialsSection() {
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div>
-                  <p className="font-semibold text-slate-900">{testimonial.name}</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="font-semibold text-slate-900 dark:text-white">{testimonial.name}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {testimonial.role} • {testimonial.company}
                   </p>
                 </div>

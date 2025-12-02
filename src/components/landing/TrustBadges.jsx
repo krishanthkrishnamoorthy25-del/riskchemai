@@ -68,7 +68,7 @@ export default function TrustBadges({ variant = "full" }) {
   }
 
   return (
-    <section className="py-16 bg-slate-50">
+    <section className="py-16 bg-slate-50 dark:bg-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -76,10 +76,10 @@ export default function TrustBadges({ variant = "full" }) {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
             Sécurité & Conformité
           </h2>
-          <p className="text-slate-600">
+          <p className="text-slate-600 dark:text-slate-300">
             Une plateforme conçue pour les exigences professionnelles
           </p>
         </motion.div>
@@ -95,7 +95,7 @@ export default function TrustBadges({ variant = "full" }) {
               className={`flex flex-col items-center text-center p-4 rounded-xl border ${colorClasses[badge.color]}`}
             >
               <badge.icon className="w-8 h-8 mb-2" />
-              <p className="font-semibold text-sm text-slate-900">{badge.title}</p>
+              <p className="font-semibold text-sm text-slate-900 dark:text-slate-800">{badge.title}</p>
               <p className="text-xs text-slate-500 mt-1">{badge.description}</p>
             </motion.div>
           ))}
