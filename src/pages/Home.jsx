@@ -9,6 +9,9 @@ import ChemicalGuardianSection from '@/components/landing/ChemicalGuardianSectio
 import PrivacyHighlightSection from '@/components/landing/PrivacyHighlightSection';
 import PricingSection from '@/components/landing/PricingSection';
 import SecuritySection from '@/components/landing/SecuritySection';
+import TestimonialsSection from '@/components/landing/TestimonialsSection';
+import TrustBadges from '@/components/landing/TrustBadges';
+import LiveStats from '@/components/landing/LiveStats';
 import Footer from '@/components/landing/Footer';
 
 export default function Home() {
