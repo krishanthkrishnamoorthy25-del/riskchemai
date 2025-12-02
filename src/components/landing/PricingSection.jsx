@@ -85,7 +85,7 @@ export default function PricingSection() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <section className="py-24 bg-slate-50">
+    <section className="py-24 bg-slate-50 dark:bg-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -93,16 +93,16 @@ export default function PricingSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
             Tarifs simples et transparents
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-8">
             Choisissez le plan adapté à vos besoins. 
             Commencez gratuitement, évoluez selon votre usage.
           </p>
           
           {/* Toggle Mensuel / Annuel */}
-          <div className="inline-flex items-center gap-4 p-1.5 bg-white rounded-xl border border-slate-200">
+          <div className="inline-flex items-center gap-4 p-1.5 bg-white dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600">
             <button
               onClick={() => setIsAnnual(false)}
               className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -139,8 +139,8 @@ export default function PricingSection() {
               transition={{ delay: index * 0.1 }}
               className={`relative rounded-2xl p-6 ${
                 plan.highlight 
-                  ? 'bg-slate-900 text-white shadow-2xl shadow-slate-900/20 scale-105 z-10' 
-                  : 'bg-white border border-slate-200'
+                  ? 'bg-slate-900 dark:bg-emerald-900 text-white shadow-2xl shadow-slate-900/20 scale-105 z-10' 
+                  : 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600'
               }`}
             >
               {plan.popular && (
@@ -160,14 +160,14 @@ export default function PricingSection() {
               )}
 
               <div className="mb-6">
-                <h3 className={`text-lg font-semibold mb-2 ${plan.highlight ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`text-lg font-semibold mb-2 ${plan.highlight ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                   {plan.name}
                 </h3>
                 <div className="flex items-baseline gap-1">
-                  <span className={`text-3xl font-bold ${plan.highlight ? 'text-white' : 'text-slate-900'}`}>
+                  <span className={`text-3xl font-bold ${plan.highlight ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                     {isAnnual ? plan.priceAnnual : plan.priceMonthly}
                   </span>
-                  <span className={plan.highlight ? 'text-slate-400' : 'text-slate-500'}>
+                  <span className={plan.highlight ? 'text-slate-400' : 'text-slate-500 dark:text-slate-400'}>
                     {plan.period}
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export default function PricingSection() {
                     Facturé {plan.annualTotal}/an
                   </p>
                 )}
-                <p className={`mt-2 text-xs ${plan.highlight ? 'text-slate-400' : 'text-slate-600'}`}>
+                <p className={`mt-2 text-xs ${plan.highlight ? 'text-slate-400' : 'text-slate-600 dark:text-slate-300'}`}>
                   {plan.description}
                 </p>
               </div>
@@ -187,7 +187,7 @@ export default function PricingSection() {
                     <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
                       plan.highlight ? 'text-emerald-400' : 'text-emerald-500'
                     }`} />
-                    <span className={`text-sm ${plan.highlight ? 'text-slate-300' : 'text-slate-600'}`}>
+                    <span className={`text-sm ${plan.highlight ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}`}>
                       {feature}
                     </span>
                   </li>
@@ -213,7 +213,7 @@ export default function PricingSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-12 text-slate-500"
+          className="text-center mt-12 text-slate-500 dark:text-slate-400"
         >
           Tous les prix sont HT. TVA applicable selon votre pays de résidence.
         </motion.p>
