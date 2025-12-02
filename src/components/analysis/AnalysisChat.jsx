@@ -9,6 +9,8 @@ import {
   MessageCircle, Send, Loader2, ExternalLink, 
   ChevronDown, ChevronUp, BookOpen, Search
 } from 'lucide-react';
+import { checkForAbuse } from './AbuseFilter';
+import { toast } from 'sonner';
 
 export default function AnalysisChat({ substances }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,10 +18,26 @@ export default function AnalysisChat({ substances }) {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([]);
 
+  // SÉCURITÉ: Sanitize les entrées utilisateur
+  const sanitizeInput = (input) => {
+    return String(input)
+      .slice(0, 500)
+      .replace(/<[^>]*>/g, '')
+      .replace(/[<>\"\'`;]/g, '')
+      .trim();
+  };
+
   const handleAsk = async () => {
     if (!question.trim() || isLoading) return;
 
-    const userQuestion = question.trim();
+    const userQuestion = sanitizeInput(question);
+    
+    // SÉCURITÉ: Vérifier le filtre anti-abus
+    const abuseCheck = checkForAbuse(userQuestion);
+    if (abuseCheck.blocked) {
+      toast.error('Cette question n\'est pas autorisée');
+      return;
+    }
     setQuestion('');
     setMessages(prev => [...prev, { role: 'user', content: userQuestion }]);
     setIsLoading(true);
@@ -221,11 +239,12 @@ FORMAT DE RÉPONSE :
               <div className="flex gap-2">
                 <Input
                   value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
+                  onChange={(e) => setQuestion(e.target.value.slice(0, 500))}
                   onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
                   placeholder="Posez une question sur les substances analysées..."
                   className="flex-1"
                   disabled={isLoading}
+                  maxLength={500}
                 />
                 <Button 
                   onClick={handleAsk}
