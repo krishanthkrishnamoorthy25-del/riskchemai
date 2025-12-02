@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import Footer from '@/components/landing/Footer';
+import DailyChemistryGame from '@/components/games/DailyChemistryGame';
 
 const CATEGORIES = {
   regulation: { label: 'Réglementation', color: 'bg-red-100 text-red-700', icon: AlertTriangle },
@@ -232,6 +233,20 @@ Pour chaque actualité, fournis:
                 Désabonnement en un clic. Pas de spam.
               </p>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mini-jeu quotidien */}
+      <section className="py-12 bg-gradient-to-br from-emerald-50 to-teal-50">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">🎮 Défi Chimie du Jour</h2>
+            <p className="text-slate-600">
+              Testez vos connaissances ! Quiz spectroscopie ou pendu chimique - un nouveau défi chaque jour.
+            </p>
+          </div>
+          <DailyChemistryGame />
           </div>
         </div>
       </section>

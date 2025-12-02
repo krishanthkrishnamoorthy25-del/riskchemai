@@ -15,6 +15,7 @@ import TrustBadges from '@/components/landing/TrustBadges';
 import LiveStats from '@/components/landing/LiveStats';
 import Footer from '@/components/landing/Footer';
 import ScrollToTopButton from '@/components/landing/ScrollToTopButton';
+import GamePromoWidget from '@/components/landing/GamePromoWidget';
 
 export default function Home() {
   return (
@@ -35,6 +36,7 @@ export default function Home() {
       <PricingSection />
       <Footer />
       <ScrollToTopButton />
+      <GamePromoWidget />
     </div>
   );
 }
