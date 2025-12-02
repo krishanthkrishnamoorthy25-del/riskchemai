@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, ChevronDown, Search, Sparkles } from 'lucide-react';
+import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
@@ -13,50 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const searchableItems = [
-  { label: 'Identification automatique', page: 'Features', section: '#identification' },
-  { label: 'Classification GHS', page: 'Features', section: '#ghs' },
-  { label: 'Tableau RAMPE', page: 'Features', section: '#rampe' },
-  { label: 'Codes H & P', page: 'Features', section: '#codes-hp' },
-  { label: 'Export PDF & CSV', page: 'Features', section: '' },
-  { label: 'Sources vérifiées', page: 'Sources', section: '' },
-  { label: 'Simulateur de réactions', page: 'Dashboard', section: '' },
-  { label: 'Tarifs', page: 'Pricing', section: '' },
-  { label: 'Sécurité', page: 'Security', section: '' },
-  { label: 'Contact', page: 'Contact', section: '' },
-];
-
 export default function Navbar({ isDark = false, toggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchRef = useRef(null);
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const filteredSearch = searchQuery.trim() 
-    ? searchableItems.filter(item => 
-        item.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
-
-  const handleSearchSelect = (item) => {
-    navigate(createPageUrl(item.page) + item.section);
-    setSearchOpen(false);
-    setSearchQuery('');
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setSearchOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -110,109 +71,24 @@ export default function Navbar({ isDark = false, toggleTheme }) {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
-              link.submenu ? (
-                <DropdownMenu key={link.name}>
-                  <DropdownMenuTrigger className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                    isDarkNav 
-                      ? 'text-slate-300 hover:text-white' 
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}>
-                    {link.name}
-                    <ChevronDown className="w-4 h-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="w-48">
-                    {link.submenu.map((sublink) => (
-                      <DropdownMenuItem key={sublink.name} asChild>
-                        <Link to={createPageUrl(sublink.page)} className="cursor-pointer">
-                          {sublink.name}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link
-                  key={link.name}
-                  to={createPageUrl(link.page)}
-                  className={`text-sm font-medium transition-colors ${
-                    isDarkNav 
-                      ? 'text-slate-300 hover:text-white' 
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              )
+              <Link
+                key={link.name}
+                to={createPageUrl(link.page)}
+                className={`text-sm font-medium transition-colors ${
+                  isDarkNav 
+                    ? 'text-slate-300 hover:text-white' 
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {link.name}
+              </Link>
             ))}
           </div>
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            {/* Search Bar */}
-            <div ref={searchRef} className="relative">
-              <div 
-                onClick={() => setSearchOpen(true)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all ${
-                  isDarkNav 
-                    ? 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20' 
-                    : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200'
-                }`}
-              >
-                <Search className="w-4 h-4" />
-                <span className="text-sm w-32">Rechercher...</span>
-                <kbd className={`text-xs px-1.5 py-0.5 rounded ${isDarkNav ? 'bg-white/10' : 'bg-white'}`}>⌘K</kbd>
-              </div>
-
-              <AnimatePresence>
-                {searchOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full mt-2 right-0 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50"
-                  >
-                    <div className="p-3 border-b border-slate-100 dark:border-slate-700">
-                      <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                        <Search className="w-4 h-4 text-slate-400" />
-                        <input
-                          type="text"
-                          placeholder="Rechercher une fonctionnalité..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
-                          autoFocus
-                        />
-                      </div>
-                    </div>
-                    <div className="max-h-64 overflow-y-auto">
-                      {filteredSearch.length > 0 ? (
-                        filteredSearch.map((item, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleSearchSelect(item)}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                          >
-                            <Sparkles className="w-4 h-4 text-emerald-500" />
-                            <span className="text-sm text-slate-700 dark:text-slate-200">{item.label}</span>
-                          </button>
-                        ))
-                      ) : searchQuery ? (
-                        <div className="px-4 py-6 text-center text-sm text-slate-400">
-                          Aucun résultat trouvé
-                        </div>
-                      ) : (
-                        <div className="px-4 py-3 text-xs text-slate-400">
-                          Tapez pour rechercher...
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
             {/* Theme Toggle */}
             {toggleTheme && (
               <button
@@ -295,32 +171,14 @@ export default function Navbar({ isDark = false, toggleTheme }) {
           >
             <div className="px-6 py-4 space-y-4">
               {navLinks.map((link) => (
-                link.submenu ? (
-                  <div key={link.name} className="space-y-2">
-                    <span className="block text-slate-400 text-sm font-semibold uppercase tracking-wider">
-                      {link.name}
-                    </span>
-                    {link.submenu.map((sublink) => (
-                      <Link
-                        key={sublink.name}
-                        to={createPageUrl(sublink.page)}
-                        onClick={() => setMobileOpen(false)}
-                        className="block text-slate-600 hover:text-slate-900 font-medium pl-3"
-                      >
-                        {sublink.name}
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <Link
-                    key={link.name}
-                    to={createPageUrl(link.page)}
-                    onClick={() => setMobileOpen(false)}
-                    className="block text-slate-600 hover:text-slate-900 font-medium"
-                  >
-                    {link.name}
-                  </Link>
-                )
+                <Link
+                  key={link.name}
+                  to={createPageUrl(link.page)}
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-slate-600 hover:text-slate-900 font-medium"
+                >
+                  {link.name}
+                </Link>
               ))}
               
               {/* Theme Toggle Mobile */}
