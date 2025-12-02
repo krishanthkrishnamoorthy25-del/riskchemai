@@ -37,6 +37,8 @@ import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { checkForAbuse } from './AbuseFilter';
+import { toast } from 'sonner';
 
 export default function ReactionSimulator({ canSimulate = true, remainingAnalyses = Infinity, onSimulationComplete }) {
   const [activeTab, setActiveTab] = useState('chemistry');
@@ -121,9 +123,18 @@ export default function ReactionSimulator({ canSimulate = true, remainingAnalyse
     }
   };
 
+  // SÉCURITÉ: Sanitize les entrées utilisateur
+  const sanitizeInput = (input, maxLength = 100) => {
+    return String(input)
+      .slice(0, maxLength)
+      .replace(/<[^>]*>/g, '')
+      .replace(/[<>\"\'`;]/g, '')
+      .trim();
+  };
+
   const updateReactant = (index, field, value) => {
     const updated = [...reactants];
-    updated[index][field] = value;
+    updated[index][field] = sanitizeInput(value);
     setReactants(updated);
   };
 
@@ -131,6 +142,15 @@ export default function ReactionSimulator({ canSimulate = true, remainingAnalyse
     const validReactants = reactants.filter(r => r.name.trim() || r.cas.trim());
     if (validReactants.length === 0) return;
     if (!canSimulate) return;
+
+    // SÉCURITÉ: Vérifier le filtre anti-abus sur chaque réactif
+    for (const reactant of validReactants) {
+      const abuseCheck = checkForAbuse(reactant.name);
+      if (abuseCheck.blocked) {
+        toast.error('Une ou plusieurs substances ne sont pas autorisées');
+        return;
+      }
+    }
 
     setIsSimulating(true);
     setResult(null);
@@ -458,6 +478,14 @@ NE FOURNIS QUE DES INFORMATIONS DES SOURCES AUTORISÉES.`;
   const simulateBiotech = async () => {
     if (!organism.trim() && !process.trim()) return;
     if (!canSimulate) return;
+
+    // SÉCURITÉ: Vérifier le filtre anti-abus
+    const orgCheck = checkForAbuse(organism);
+    const procCheck = checkForAbuse(process);
+    if (orgCheck.blocked || procCheck.blocked) {
+      toast.error('Cette recherche n\'est pas autorisée');
+      return;
+    }
 
     setIsSimulating(true);
     setResult(null);
@@ -799,7 +827,8 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
               <Input
                 placeholder="ex: E. coli K-12, cellules HEK293, S. cerevisiae"
                 value={organism}
-                onChange={(e) => setOrganism(e.target.value)}
+                onChange={(e) => setOrganism(sanitizeInput(e.target.value, 150))}
+                maxLength={150}
               />
             </div>
             <div>
@@ -807,7 +836,8 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
               <Input
                 placeholder="ex: Fermentation lactique, expression protéique, CRISPR"
                 value={process}
-                onChange={(e) => setProcess(e.target.value)}
+                onChange={(e) => setProcess(sanitizeInput(e.target.value, 200))}
+                maxLength={200}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -816,7 +846,8 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                 <Input
                   placeholder="ex: Glucose, milieu LB, DMEM"
                   value={substrate}
-                  onChange={(e) => setSubstrate(e.target.value)}
+                  onChange={(e) => setSubstrate(sanitizeInput(e.target.value, 100))}
+                  maxLength={100}
                 />
               </div>
               <div>
