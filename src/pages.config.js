@@ -20,6 +20,7 @@ import UseCases from './pages/UseCases';
 import WhyUs from './pages/WhyUs';
 import Demo from './pages/Demo';
 import Limitations from './pages/Limitations';
+import News from './pages/News';
 import __Layout from './Layout.jsx';
 
 
@@ -46,6 +47,7 @@ export const PAGES = {
     "WhyUs": WhyUs,
     "Demo": Demo,
     "Limitations": Limitations,
+    "News": News,
 }
 
 export const pagesConfig = {

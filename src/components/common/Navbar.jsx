@@ -78,20 +78,7 @@ export default function Navbar({ isDark = false, toggleTheme }) {
   const navLinks = [
     { name: 'Fonctionnalités', page: 'Features' },
     { name: 'Tarifs', page: 'Pricing' },
-    { name: 'Sources', page: 'Sources' },
-    { 
-      name: 'Ressources', 
-      submenu: [
-        { name: 'Cas d\'usage', page: 'UseCases' },
-        { name: 'Pourquoi nous ?', page: 'WhyUs' },
-        { name: 'Démonstration', page: 'Demo' },
-        { name: 'À propos', page: 'About' },
-        { name: 'Contact', page: 'Contact' },
-        { name: 'Sécurité', page: 'Security' },
-        { name: 'Changelog', page: 'Changelog' },
-        { name: 'Support', page: 'Support' }
-      ]
-    }
+    { name: 'Actualités', page: 'News' }
   ];
 
   const userMenuLinks = [
