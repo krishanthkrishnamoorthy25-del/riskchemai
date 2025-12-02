@@ -358,7 +358,9 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
       await base44.entities.AnalysisLog.update(logs[0].id, { export_format: format });
     }
 
-    // Generate export content
+    const dateStr = new Date().toLocaleDateString('fr-FR');
+    const fileName = `analyse-rampe-${new Date().toISOString().split('T')[0]}`;
+
     if (format === 'csv') {
       const headers = ['Nom', 'CAS', 'Formule', 'Masse Molaire (g/mol)', 'Rôle', 'GHS', 'Codes H', 'Codes P', 'Danger', 'EPI', 'Ventilation', 'Stockage', 'Incompatibilités', 'Confiance'];
       const rows = analysisResults.map(s => [
@@ -383,8 +385,116 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `analyse-rampe-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `${fileName}.csv`;
       link.click();
+    } else if (format === 'pdf') {
+      // Générer un HTML pour impression en PDF
+      const htmlContent = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Analyse RAMPE - ${dateStr}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; padding: 20px; color: #1e293b; font-size: 11px; }
+    .header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #10b981; }
+    .header h1 { color: #10b981; font-size: 22px; margin-bottom: 5px; }
+    .header p { color: #64748b; font-size: 12px; }
+    .warning { background: #fef3c7; border: 1px solid #f59e0b; padding: 10px; border-radius: 6px; margin-bottom: 20px; }
+    .warning strong { color: #b45309; }
+    .substance { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; page-break-inside: avoid; }
+    .substance-header { background: #f8fafc; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    .substance-header h2 { font-size: 14px; color: #0f172a; margin-bottom: 4px; }
+    .substance-header .meta { display: flex; gap: 15px; font-size: 10px; color: #64748b; }
+    .substance-header .meta span { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+    .substance-body { padding: 12px; }
+    .section { margin-bottom: 10px; }
+    .section-title { font-weight: bold; color: #475569; font-size: 11px; margin-bottom: 4px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
+    .danger-box { background: #fef2f2; border-left: 3px solid #ef4444; padding: 8px; margin: 8px 0; }
+    .codes { display: flex; flex-wrap: wrap; gap: 4px; }
+    .code { background: #fff7ed; border: 1px solid #fdba74; padding: 2px 6px; border-radius: 4px; font-size: 9px; }
+    .code.p { background: #eff6ff; border-color: #93c5fd; }
+    .protections { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .protection { background: #f0fdf4; padding: 6px; border-radius: 4px; }
+    .protection-title { font-weight: bold; font-size: 9px; color: #166534; }
+    .footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 9px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🧪 Rapport d'Analyse RAMPE</h1>
+    <p>ChemRisk AI - Généré le ${dateStr} | ${analysisResults.length} substance(s) analysée(s)</p>
+  </div>
+  
+  <div class="warning">
+    <strong>⚠️ Avertissement :</strong> Ce rapport est un outil d'aide à l'identification des risques. 
+    Toutes les informations doivent être vérifiées par un responsable HSE qualifié avant utilisation.
+  </div>
+
+  ${analysisResults.map(s => `
+    <div class="substance">
+      <div class="substance-header">
+        <h2>${s.name}</h2>
+        <div class="meta">
+          <span><strong>CAS:</strong> ${s.cas || 'N/A'}</span>
+          <span><strong>Formule:</strong> ${s.molecular_formula || 'N/A'}</span>
+          <span><strong>MM:</strong> ${s.molecular_weight ? s.molecular_weight + ' g/mol' : 'N/A'}</span>
+          <span><strong>Rôle:</strong> ${s.role || 'N/A'}</span>
+          <span><strong>Confiance:</strong> ${s.confidence_score ? Math.round(s.confidence_score * 100) + '%' : 'N/A'}</span>
+        </div>
+      </div>
+      <div class="substance-body">
+        ${s.danger_summary ? `<div class="danger-box"><strong>⚠️ Dangers :</strong> ${s.danger_summary}</div>` : ''}
+        
+        ${s.ghs_classes?.length ? `
+        <div class="section">
+          <div class="section-title">Classification GHS</div>
+          <div class="codes">${s.ghs_classes.map(c => `<span class="code">${c}</span>`).join('')}</div>
+        </div>` : ''}
+
+        ${s.h_codes?.length ? `
+        <div class="section">
+          <div class="section-title">Mentions de danger (H)</div>
+          <div class="codes">${s.h_codes.map(c => `<span class="code">${c}</span>`).join('')}</div>
+        </div>` : ''}
+
+        ${s.p_codes?.length ? `
+        <div class="section">
+          <div class="section-title">Conseils de prudence (P)</div>
+          <div class="codes">${s.p_codes.map(c => `<span class="code p">${c}</span>`).join('')}</div>
+        </div>` : ''}
+
+        ${s.protections ? `
+        <div class="section">
+          <div class="section-title">Protections recommandées</div>
+          <div class="protections">
+            ${s.protections.epi ? `<div class="protection"><div class="protection-title">EPI</div>${s.protections.epi}</div>` : ''}
+            ${s.protections.ventilation ? `<div class="protection"><div class="protection-title">Ventilation</div>${s.protections.ventilation}</div>` : ''}
+            ${s.protections.stockage ? `<div class="protection"><div class="protection-title">Stockage</div>${s.protections.stockage}</div>` : ''}
+            ${s.protections.incompatibilites ? `<div class="protection"><div class="protection-title">Incompatibilités</div>${s.protections.incompatibilites}</div>` : ''}
+          </div>
+        </div>` : ''}
+      </div>
+    </div>
+  `).join('')}
+
+  <div class="footer">
+    <p>Document généré par ChemRisk AI | Sources : PubChem, ECHA</p>
+    <p>Ce document ne remplace pas les Fiches de Données de Sécurité officielles</p>
+  </div>
+</body>
+</html>`;
+
+      // Ouvrir dans une nouvelle fenêtre pour impression
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      // Attendre le chargement puis lancer l'impression
+      printWindow.onload = () => {
+        printWindow.print();
+      };
     }
   };
 
