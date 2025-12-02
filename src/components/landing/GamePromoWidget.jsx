@@ -10,7 +10,7 @@ export default function GamePromoWidget() {
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="fixed bottom-24 right-6 z-40"
+      className="fixed bottom-4 right-4 z-40"
     >
       <Link to={createPageUrl('News')}>
         <div className="group relative">

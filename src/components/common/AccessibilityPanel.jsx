@@ -109,14 +109,14 @@ export default function AccessibilityPanel() {
         }
       `}</style>
 
-      {/* Bouton d'accessibilité */}
+      {/* Bouton d'accessibilité - positionné en bas à gauche, bien séparé */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 left-6 z-50 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg transition-transform hover:scale-110"
+        className="fixed bottom-4 left-4 z-[60] p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg transition-all hover:scale-105"
         aria-label="Options d'accessibilité"
         title="Options d'accessibilité"
       >
-        <Accessibility className="w-6 h-6" />
+        <Accessibility className="w-5 h-5" />
       </button>
 
       {/* Panel */}
@@ -126,7 +126,7 @@ export default function AccessibilityPanel() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-20 left-6 z-50 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden"
+            className="fixed bottom-16 left-4 z-[60] w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden"
           >
             <div className="p-4 bg-indigo-600 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
