@@ -21,7 +21,8 @@ export default function Footer() {
       { name: 'Politique de confidentialité', page: 'Privacy' },
       { name: 'Cookies', page: 'Cookies' },
       { name: 'CGU', page: 'Terms' },
-      { name: 'Avertissements', page: 'Disclaimer' }
+      { name: 'Avertissements', page: 'Disclaimer' },
+      { name: 'Limites du service', page: 'Limitations' }
     ],
     support: [
       { name: 'Centre d\'aide', page: 'Support' },

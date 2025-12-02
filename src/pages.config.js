@@ -19,6 +19,7 @@ import Changelog from './pages/Changelog';
 import UseCases from './pages/UseCases';
 import WhyUs from './pages/WhyUs';
 import Demo from './pages/Demo';
+import Limitations from './pages/Limitations';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +45,7 @@ export const PAGES = {
     "UseCases": UseCases,
     "WhyUs": WhyUs,
     "Demo": Demo,
+    "Limitations": Limitations,
 }
 
 export const pagesConfig = {
