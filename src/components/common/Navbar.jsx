@@ -40,7 +40,7 @@ export default function Navbar() {
     { name: 'Fonctionnalités', page: 'Features' },
     { name: 'Tarifs', page: 'Pricing' },
     { name: 'Sources', page: 'Sources' },
-    { name: 'Contact', page: 'Contact' }
+    { name: 'À propos', page: 'About' }
   ];
 
   const isLandingPage = location.pathname === '/' || location.pathname === '/Home';

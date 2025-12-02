@@ -15,12 +15,15 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <HeroSection />
+      <LiveStats />
+      <TrustBadges />
       <FeaturesGrid />
       <AIEngineSection />
       <DangerDetectionSection />
       <SafetyPackSection />
       <UserModesSection />
       <ChemicalGuardianSection />
+      <TestimonialsSection />
       <PrivacyHighlightSection />
       <SecuritySection />
       <PricingSection />

@@ -23,8 +23,10 @@ export default function Footer() {
     support: [
       { name: 'Centre d\'aide', page: 'Support' },
       { name: 'Sécurité', page: 'Security' },
-      { name: 'Contact', page: 'Contact' }
-    ]
+      { name: 'Contact', page: 'Contact' },
+      { name: 'À propos', page: 'About' },
+      { name: 'Changelog', page: 'Changelog' }
+      ]
   };
 
   return (
