@@ -486,14 +486,30 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
 </body>
 </html>`;
 
-      // Ouvrir dans une nouvelle fenêtre pour impression
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
+      // Créer un iframe caché pour l'impression
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
+      
+      const iframeDoc = iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(htmlContent);
+      iframeDoc.close();
       
       // Attendre le chargement puis lancer l'impression
-      printWindow.onload = () => {
-        printWindow.print();
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.print();
+          // Nettoyer après impression
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+          }, 1000);
+        }, 250);
       };
     }
   };
