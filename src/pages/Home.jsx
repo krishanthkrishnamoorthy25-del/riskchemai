@@ -10,6 +10,7 @@ import PrivacyHighlightSection from '@/components/landing/PrivacyHighlightSectio
 import PricingSection from '@/components/landing/PricingSection';
 import SecuritySection from '@/components/landing/SecuritySection';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
+import LiveRatings from '@/components/landing/LiveRatings';
 import TrustBadges from '@/components/landing/TrustBadges';
 import LiveStats from '@/components/landing/LiveStats';
 import Footer from '@/components/landing/Footer';
@@ -28,6 +29,7 @@ export default function Home() {
       <UserModesSection />
       <ChemicalGuardianSection />
       <TestimonialsSection />
+      <LiveRatings />
       <PrivacyHighlightSection />
       <SecuritySection />
       <PricingSection />
