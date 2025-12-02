@@ -186,7 +186,16 @@ POUR CHAQUE SUBSTANCE, FOURNIS OBLIGATOIREMENT:
    - protections.stockage: Conditions de stockage
    - protections.incompatibilites: Substances incompatibles
 
-5. MÉTA:
+5. INFORMATIONS SPÉCIFIQUES SELON LE RÔLE:
+   - SI RÉACTIF: role_info.common_reactions: Liste de 3-5 réactions classiques où ce réactif est utilisé (ex: "Oxydation des alcools", "Estérification")
+   - SI PRODUIT: role_info.synthesis_methods: Liste de 2-3 méthodes courantes pour obtenir ce produit (ex: "Réaction de Grignard", "Hydrogénation catalytique")
+   - SI SOLVANT: role_info.characteristics: Propriétés clés (polarité, point d'ébullition, miscibilité)
+                 role_info.alternatives: Liste de solvants alternatifs moins chers ou moins toxiques si possible, sinon indiquer "Bon choix de solvant" avec justification
+                 role_info.green_score: Note de 1 à 5 sur l'aspect environnemental (5 = très vert)
+   - SI CATALYSEUR: role_info.catalyzed_reactions: Types de réactions catalysées
+                    role_info.alternatives: Catalyseurs alternatifs possibles
+
+6. MÉTA:
    - confidence_score: Score de confiance (0.0 à 1.0) basé sur la fiabilité des sources
    - sources: Références avec URLs vers PubChem, ECHA, etc.
    - role: Le rôle fourni par l'utilisateur
@@ -223,6 +232,17 @@ IMPORTANT: Utilise les données exactes de PubChem. Ne fournis AUCUN protocole e
                       ventilation: { type: "string" },
                       stockage: { type: "string" },
                       incompatibilites: { type: "string" }
+                    }
+                  },
+                  role_info: {
+                    type: "object",
+                    properties: {
+                      common_reactions: { type: "array", items: { type: "string" } },
+                      synthesis_methods: { type: "array", items: { type: "string" } },
+                      characteristics: { type: "string" },
+                      alternatives: { type: "array", items: { type: "string" } },
+                      green_score: { type: "number" },
+                      catalyzed_reactions: { type: "array", items: { type: "string" } }
                     }
                   },
                   confidence_score: { type: "number" },

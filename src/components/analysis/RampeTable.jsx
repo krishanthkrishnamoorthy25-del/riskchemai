@@ -11,8 +11,20 @@ import {
   CheckCircle,
   Atom,
   Hash,
-  FileText
+  FileText,
+  Beaker,
+  Droplets,
+  RefreshCw,
+  Zap
 } from 'lucide-react';
+
+// Flask icon (custom since not in lucide)
+const Flask = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 3h6v6l4 8H5l4-8V3z"/>
+    <path d="M9 3h6"/>
+  </svg>
+);
 import { GHSPictogramRow } from './GHSPictograms';
 import QuickSearch from './QuickSearch';
 
@@ -205,6 +217,105 @@ function SubstanceCard({ substance, index }) {
             )}
           </div>
         </div>
+
+        {/* Informations spécifiques au rôle */}
+        {substance.role_info && (
+          <div className="pt-4 border-t border-slate-100">
+            {/* Réactif - Réactions courantes */}
+            {substance.role_info.common_reactions?.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                  <Beaker className="w-4 h-4 text-indigo-500" />
+                  Réactions courantes
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {substance.role_info.common_reactions.map((reaction, i) => (
+                    <Badge key={i} variant="outline" className="bg-indigo-50 border-indigo-200 text-indigo-700">
+                      {reaction}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Produit - Méthodes de synthèse */}
+            {substance.role_info.synthesis_methods?.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                  <Flask className="w-4 h-4 text-purple-500" />
+                  Méthodes d'obtention
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {substance.role_info.synthesis_methods.map((method, i) => (
+                    <Badge key={i} variant="outline" className="bg-purple-50 border-purple-200 text-purple-700">
+                      {method}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Solvant - Caractéristiques et alternatives */}
+            {substance.role_info.characteristics && (
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                  <Droplets className="w-4 h-4 text-cyan-500" />
+                  Caractéristiques du solvant
+                </h4>
+                <p className="text-sm text-slate-600 bg-cyan-50 p-3 rounded-lg">
+                  {substance.role_info.characteristics}
+                </p>
+                {substance.role_info.green_score && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-xs text-slate-500">Score environnemental:</span>
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(n => (
+                        <div 
+                          key={n} 
+                          className={`w-3 h-3 rounded-full ${n <= substance.role_info.green_score ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Alternatives (solvants ou catalyseurs) */}
+            {substance.role_info.alternatives?.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-green-500" />
+                  Alternatives
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {substance.role_info.alternatives.map((alt, i) => (
+                    <Badge key={i} variant="outline" className="bg-green-50 border-green-200 text-green-700">
+                      {alt}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Catalyseur - Réactions catalysées */}
+            {substance.role_info.catalyzed_reactions?.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-amber-500" />
+                  Réactions catalysées
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {substance.role_info.catalyzed_reactions.map((reaction, i) => (
+                    <Badge key={i} variant="outline" className="bg-amber-50 border-amber-200 text-amber-700">
+                      {reaction}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Sources */}
         {substance.sources?.length > 0 && (
