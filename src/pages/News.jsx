@@ -247,7 +247,6 @@ Pour chaque actualité, fournis:
             </p>
           </div>
           <DailyChemistryGame />
-          </div>
         </div>
       </section>
 
