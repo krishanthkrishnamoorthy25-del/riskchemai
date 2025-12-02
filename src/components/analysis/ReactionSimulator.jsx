@@ -113,7 +113,16 @@ INSTRUCTIONS CRITIQUES:
 1. RECHERCHE cette réaction UNIQUEMENT dans les sources autorisées ci-dessus
 2. CITE chaque source avec son URL/DOI vérifié
 3. Attribue un SCORE DE PROVENANCE (0-100) basé sur la fiabilité des sources trouvées
-4. Si la réaction n'est pas documentée dans ces sources, indique-le clairement
+4. Si la réaction n'est PAS documentée dans ces sources:
+   - Indique clairement "Réaction non documentée dans les sources autorisées"
+   - PROPOSE des réactions POSSIBLES basées sur l'analyse chimique des réactifs:
+     * Identifie les caractères chimiques: nucléophile, électrophile, base, acide, radical
+     * Identifie les groupes fonctionnels réactifs
+     * Propose les mécanismes plausibles: SN1, SN2, SNAr, E1, E2, addition nucléophile, 
+       addition électrophile, substitution radicalaire, cycloaddition, réarrangement, etc.
+     * Pour chaque mécanisme proposé, explique POURQUOI il est plausible chimiquement
+     * Indique les conditions qui favoriseraient chaque voie réactionnelle
+   - Marque clairement ces propositions comme "HYPOTHÈSES THÉORIQUES À VÉRIFIER"
 
 FOURNIS:
 

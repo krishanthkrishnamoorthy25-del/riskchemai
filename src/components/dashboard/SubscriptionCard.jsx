@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { CreditCard, Calendar, ArrowRight, AlertTriangle } from 'lucide-react';
+import { CreditCard, Calendar, ArrowRight, AlertTriangle, FlaskConical, Zap } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -16,20 +16,33 @@ export default function SubscriptionCard({ subscription }) {
     ? differenceInDays(new Date(subscription.trial_end), new Date())
     : 0;
 
-  const usageLimit = subscription.plan === 'enterprise' ? null : 
-                     subscription.plan === 'standard' ? 100 : 10;
-  const usagePercent = usageLimit ? (subscription.analyses_count_this_month / usageLimit) * 100 : 0;
+  // Limites séparées pour RAMPE et Simulations
+  const plan = subscription.plan || 'trial';
+  const getLimits = () => {
+    if (plan === 'enterprise') return { rampe: null, simulations: null };
+    if (plan === 'standard') return { rampe: 100, simulations: 100 };
+    if (plan === 'student') return { rampe: 30, simulations: 30 };
+    return { rampe: 10, simulations: 5 }; // trial
+  };
+  const limits = getLimits();
+  
+  const rampeCount = subscription.analyses_count_this_month || 0;
+  const simCount = subscription.simulations_count_this_month || 0;
+  const rampePercent = limits.rampe ? (rampeCount / limits.rampe) * 100 : 0;
+  const simPercent = limits.simulations ? (simCount / limits.simulations) * 100 : 0;
 
   const planNames = {
     trial: 'Essai gratuit',
+    student: 'Étudiant',
     standard: 'Standard',
     enterprise: 'Entreprise'
   };
 
   const planPrices = {
     trial: '0€',
-    standard: '29€/mois',
-    enterprise: '89€/mois'
+    student: '9,99€/mois',
+    standard: '29,99€/mois',
+    enterprise: '89,99€/mois'
   };
 
   return (
@@ -72,16 +85,33 @@ export default function SubscriptionCard({ subscription }) {
           </div>
         )}
 
-        {/* Usage */}
-        {usageLimit && (
+        {/* Usage - Analyses RAMPE */}
+        {limits.rampe && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-600">Usage mensuel</span>
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <FlaskConical className="w-3.5 h-3.5" /> Analyses RAMPE
+              </span>
               <span className="text-sm font-medium text-slate-900">
-                {subscription.analyses_count_this_month} / {usageLimit}
+                {rampeCount} / {limits.rampe}
               </span>
             </div>
-            <Progress value={usagePercent} className="h-2" />
+            <Progress value={rampePercent} className="h-2" />
+          </div>
+        )}
+
+        {/* Usage - Simulations */}
+        {limits.simulations && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-slate-600 flex items-center gap-1">
+                <Zap className="w-3.5 h-3.5" /> Simulations réactions
+              </span>
+              <span className="text-sm font-medium text-slate-900">
+                {simCount} / {limits.simulations}
+              </span>
+            </div>
+            <Progress value={simPercent} className="h-2" />
           </div>
         )}
 
