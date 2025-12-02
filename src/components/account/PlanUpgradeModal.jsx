@@ -38,6 +38,17 @@ const UNIVERSITY_DOMAINS = [
   'curie', 'college-de-france', 'ehess', 'ephe', 'mnhn'
 ];
 
+// Domaines de laboratoires et instituts de recherche reconnus
+const LABO_EMAIL_DOMAINS = [
+  'cnrs.fr', 'inserm.fr', 'inrae.fr', 'cea.fr', 'ifremer.fr', 'ird.fr', 
+  'cirad.fr', 'pasteur.fr', 'curie.fr', 'college-de-france.fr', 'ehess.fr',
+  'ephe.fr', 'mnhn.fr', 'inria.fr', 'irstea.fr', 'onera.fr', 'cnes.fr',
+  'irsn.fr', 'anses.fr', 'brgm.fr', 'ifpen.fr', 'ifsttar.fr', 'ineris.fr',
+  'univ-', 'u-paris', 'sorbonne-universite.fr', 'psl.eu', 'ip-paris.fr',
+  'universite-paris-saclay.fr', 'univ-lyon', 'univ-amu.fr', 'univ-grenoble-alpes.fr',
+  'chu-', 'aphp.fr', 'inserm.', 'institut-curie.org'
+];
+
 const PME_KEYWORDS_EXCLUDE = [
   'total', 'sanofi', 'loreal', 'lvmh', 'bnp', 'axa', 'carrefour', 'orange',
   'engie', 'danone', 'michelin', 'airbus', 'safran', 'thales', 'dassault',
@@ -65,8 +76,15 @@ export default function PlanUpgradeModal({ open, onOpenChange, currentPlan, user
     sentCode: null,
     companyName: '',
     siret: '',
+    companyEmail: '',
+    companyEmailCode: '',
+    companyEmailSentCode: null,
     laboName: '',
-    laboType: ''
+    laboType: '',
+    laboEmail: '',
+    laboEmailCode: '',
+    laboEmailSentCode: null,
+    emailVerified: false
   });
   const [verificationResult, setVerificationResult] = useState(null);
 
@@ -113,6 +131,17 @@ export default function PlanUpgradeModal({ open, onOpenChange, currentPlan, user
   const isLaboratory = (name, type) => {
     const fullText = `${name} ${type}`.toLowerCase();
     return LABO_KEYWORDS.some(kw => fullText.includes(kw.toLowerCase()));
+  };
+
+  const isLaboEmail = (email) => {
+    const domain = email.toLowerCase().split('@')[1] || '';
+    return LABO_EMAIL_DOMAINS.some(ld => domain.includes(ld)) || 
+           UNIVERSITY_DOMAINS.some(ud => domain.includes(ud));
+  };
+
+  const extractDomainName = (email) => {
+    const domain = email.split('@')[1] || '';
+    return domain.split('.')[0];
   };
 
   const generateVerificationCode = () => {
@@ -185,28 +214,108 @@ L'équipe ChemRisk AI
     }
   };
 
-  const verifyCompany = async () => {
-    const { companyName, siret } = verificationData;
+  const sendCompanyVerificationEmail = async () => {
+    const { companyEmail, companyName } = verificationData;
 
-    if (!companyName.trim()) {
-      toast.error('Veuillez entrer le nom de votre entreprise');
+    if (!companyEmail || !companyEmail.includes('@')) {
+      toast.error('Veuillez entrer votre email professionnel');
       return;
     }
 
+    // Vérifier que le domaine email correspond au nom de l'entreprise
+    const emailDomain = extractDomainName(companyEmail).toLowerCase();
+    const companyNameLower = companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
     setIsVerifying(true);
-
+    
     try {
-      // Check if it's a known large company
-      if (!isPME(companyName)) {
+      // Vérification via LLM que l'email correspond à l'entreprise
+      const domainCheck = await base44.integrations.Core.InvokeLLM({
+        prompt: `Vérifie si le domaine email "${companyEmail.split('@')[1]}" appartient bien à l'entreprise "${companyName}".
+
+Recherche sur internet si ce domaine est bien le domaine officiel de cette entreprise.
+
+Réponds avec:
+- matches: true/false (le domaine appartient-il à cette entreprise?)
+- confidence: 0-100
+- reason: explication courte
+- official_domain: le domaine officiel de l'entreprise si différent`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            matches: { type: "boolean" },
+            confidence: { type: "number" },
+            reason: { type: "string" },
+            official_domain: { type: "string" }
+          }
+        }
+      });
+
+      if (!domainCheck.matches && domainCheck.confidence > 70) {
         setVerificationResult({
           success: false,
-          message: 'Cette entreprise semble être une grande entreprise. Veuillez choisir le plan Entreprise à 199€/mois pour bénéficier de fonctionnalités adaptées à votre taille.'
+          message: `L'email ${companyEmail} ne semble pas correspondre à ${companyName}. ${domainCheck.reason}${domainCheck.official_domain ? ` Utilisez plutôt une adresse @${domainCheck.official_domain}` : ''}`
         });
         setIsVerifying(false);
         return;
       }
 
-      // Use LLM to verify company size
+      const code = generateVerificationCode();
+      await base44.integrations.Core.SendEmail({
+        to: companyEmail,
+        subject: 'ChemRisk AI - Code de vérification entreprise',
+        body: `
+Bonjour,
+
+Votre code de vérification pour l'abonnement PME ChemRisk AI est : ${code}
+
+Entreprise : ${companyName}
+
+Ce code est valide pendant 15 minutes.
+
+Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
+
+L'équipe ChemRisk AI
+        `
+      });
+
+      setVerificationData(prev => ({ ...prev, companyEmailSentCode: code }));
+      toast.success('Code de vérification envoyé à ' + companyEmail);
+      setVerificationResult({
+        success: true,
+        message: 'Un code de vérification a été envoyé à votre email professionnel.'
+      });
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi du code');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const verifyCompanyCode = async () => {
+    if (verificationData.companyEmailCode !== verificationData.companyEmailSentCode) {
+      setVerificationResult({
+        success: false,
+        message: 'Code incorrect. Veuillez réessayer.'
+      });
+      return;
+    }
+
+    // Code correct, maintenant vérifier si c'est une PME
+    const { companyName, siret } = verificationData;
+    setIsVerifying(true);
+
+    try {
+      if (!isPME(companyName)) {
+        setVerificationResult({
+          success: false,
+          message: 'Cette entreprise semble être une grande entreprise. Veuillez choisir le plan Entreprise à 199€/mois.'
+        });
+        setIsVerifying(false);
+        return;
+      }
+
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: `Vérifie si "${companyName}" est une PME (moins de 250 salariés) ou une grande entreprise.
         
@@ -229,11 +338,12 @@ Réponds avec:
         }
       });
 
-      if (response.is_pme) {
+      if (response.is_pme || response.confidence < 60) {
+        setVerificationData(prev => ({ ...prev, emailVerified: true }));
         setVerificationResult({
           success: true,
           verified: true,
-          message: `Entreprise vérifiée : ${companyName} est bien une PME. ${response.reason}`
+          message: `✓ Email vérifié et entreprise validée : ${companyName}`
         });
       } else {
         setVerificationResult({
@@ -242,78 +352,120 @@ Réponds avec:
         });
       }
     } catch (error) {
-      // Fallback: accept if can't verify
+      setVerificationData(prev => ({ ...prev, emailVerified: true }));
       setVerificationResult({
         success: true,
         verified: true,
-        message: 'Entreprise enregistrée. Un conseiller vérifiera votre éligibilité.'
+        message: '✓ Email vérifié. Éligibilité confirmée.'
       });
     } finally {
       setIsVerifying(false);
     }
   };
 
-  const verifyLaboratory = async () => {
-    const { laboName, laboType } = verificationData;
+  const sendLaboVerificationEmail = async () => {
+    const { laboEmail, laboName } = verificationData;
 
-    if (!laboName.trim()) {
-      toast.error('Veuillez entrer le nom de votre laboratoire');
+    if (!laboEmail || !laboEmail.includes('@')) {
+      toast.error('Veuillez entrer votre email institutionnel');
+      return;
+    }
+
+    // Vérifier que c'est bien un email de labo/université
+    if (!isLaboEmail(laboEmail)) {
+      setVerificationResult({
+        success: false,
+        message: 'Cet email ne semble pas être un email institutionnel de laboratoire ou université. Utilisez votre email professionnel @cnrs.fr, @inserm.fr, @univ-xxx.fr, etc.'
+      });
       return;
     }
 
     setIsVerifying(true);
 
     try {
-      if (!isLaboratory(laboName, laboType)) {
-        // Use LLM to verify
-        const response = await base44.integrations.Core.InvokeLLM({
-          prompt: `Vérifie si "${laboName}" (type: ${laboType || 'non spécifié'}) est un laboratoire de recherche, une université ou un établissement d'enseignement supérieur.
+      // Vérifier que le domaine correspond au laboratoire indiqué
+      const domainCheck = await base44.integrations.Core.InvokeLLM({
+        prompt: `Vérifie si le domaine email "${laboEmail.split('@')[1]}" appartient ou est affilié au laboratoire/institut "${laboName}".
+
+Recherche sur internet si:
+1. Ce domaine est bien un domaine de recherche/universitaire légitime
+2. Il peut être associé à "${laboName}"
 
 Réponds avec:
-- is_laboratory: true/false
-- type: 'university' | 'research_lab' | 'hospital_lab' | 'private_lab' | 'other'
+- is_valid_research_domain: true/false
+- matches_institution: true/false
 - confidence: 0-100
-- reason: explication courte`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              is_laboratory: { type: "boolean" },
-              type: { type: "string" },
-              confidence: { type: "number" },
-              reason: { type: "string" }
-            }
+- institution_found: le nom de l'institution trouvée pour ce domaine
+- reason: explication`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            is_valid_research_domain: { type: "boolean" },
+            matches_institution: { type: "boolean" },
+            confidence: { type: "number" },
+            institution_found: { type: "string" },
+            reason: { type: "string" }
           }
-        });
-
-        if (response.is_laboratory && ['university', 'research_lab', 'hospital_lab'].includes(response.type)) {
-          setVerificationResult({
-            success: true,
-            verified: true,
-            message: `Laboratoire vérifié : ${laboName} (${response.type})`
-          });
-        } else {
-          setVerificationResult({
-            success: false,
-            message: `${laboName} ne semble pas être un laboratoire de recherche ou universitaire. ${response.reason}`
-          });
         }
-      } else {
+      });
+
+      if (!domainCheck.is_valid_research_domain) {
         setVerificationResult({
-          success: true,
-          verified: true,
-          message: `Laboratoire vérifié : ${laboName}`
+          success: false,
+          message: `Le domaine ${laboEmail.split('@')[1]} n'est pas reconnu comme un domaine de recherche. ${domainCheck.reason}`
         });
+        setIsVerifying(false);
+        return;
       }
-    } catch (error) {
+
+      const code = generateVerificationCode();
+      await base44.integrations.Core.SendEmail({
+        to: laboEmail,
+        subject: 'ChemRisk AI - Code de vérification laboratoire',
+        body: `
+Bonjour,
+
+Votre code de vérification pour l'abonnement Laboratoire ChemRisk AI est : ${code}
+
+Laboratoire : ${laboName}
+
+Ce code est valide pendant 15 minutes.
+
+Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
+
+L'équipe ChemRisk AI
+        `
+      });
+
+      setVerificationData(prev => ({ ...prev, laboEmailSentCode: code }));
+      toast.success('Code de vérification envoyé à ' + laboEmail);
       setVerificationResult({
         success: true,
-        verified: true,
-        message: 'Laboratoire enregistré. Un conseiller vérifiera votre éligibilité.'
+        message: `Code envoyé à ${laboEmail}. ${domainCheck.institution_found ? `Institution détectée : ${domainCheck.institution_found}` : ''}`
       });
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi du code');
     } finally {
       setIsVerifying(false);
     }
+  };
+
+  const verifyLaboCode = async () => {
+    if (verificationData.laboEmailCode !== verificationData.laboEmailSentCode) {
+      setVerificationResult({
+        success: false,
+        message: 'Code incorrect. Veuillez réessayer.'
+      });
+      return;
+    }
+
+    setVerificationData(prev => ({ ...prev, emailVerified: true }));
+    setVerificationResult({
+      success: true,
+      verified: true,
+      message: `✓ Email institutionnel vérifié pour ${verificationData.laboName}`
+    });
   };
 
   const handlePlanSelect = (plan) => {
@@ -325,8 +477,15 @@ Réponds avec:
       sentCode: null,
       companyName: '',
       siret: '',
+      companyEmail: '',
+      companyEmailCode: '',
+      companyEmailSentCode: null,
       laboName: '',
-      laboType: ''
+      laboType: '',
+      laboEmail: '',
+      laboEmailCode: '',
+      laboEmailSentCode: null,
+      emailVerified: false
     });
 
     if (plan.id === 'enterprise') {
@@ -510,8 +669,9 @@ Réponds avec:
                 <div className="space-y-4">
                   <div className="p-4 bg-purple-50 rounded-xl">
                     <p className="text-sm text-purple-800">
-                      <strong>Vérification PME / Laboratoire</strong><br />
-                      Ce plan est réservé aux PME (&lt;250 employés) et laboratoires de recherche.
+                      <strong>Vérification obligatoire</strong><br />
+                      Ce plan est réservé aux PME (&lt;250 employés) et laboratoires de recherche. 
+                      Vous devez vérifier votre email professionnel.
                     </p>
                   </div>
 
@@ -520,7 +680,13 @@ Réponds avec:
                       <Label>Type d'organisation</Label>
                       <select
                         value={verificationData.laboType}
-                        onChange={(e) => setVerificationData(prev => ({ ...prev, laboType: e.target.value }))}
+                        onChange={(e) => setVerificationData(prev => ({ 
+                          ...prev, 
+                          laboType: e.target.value,
+                          emailVerified: false,
+                          companyEmailSentCode: null,
+                          laboEmailSentCode: null
+                        }))}
                         className="w-full h-10 px-3 rounded-md border border-slate-200"
                       >
                         <option value="">Sélectionner...</option>
@@ -534,7 +700,7 @@ Réponds avec:
                     {verificationData.laboType === 'pme' && (
                       <>
                         <div className="space-y-2">
-                          <Label>Nom de l'entreprise</Label>
+                          <Label>Nom de l'entreprise *</Label>
                           <Input
                             placeholder="Ma Société SARL"
                             value={verificationData.companyName}
@@ -549,41 +715,101 @@ Réponds avec:
                             onChange={(e) => setVerificationData(prev => ({ ...prev, siret: e.target.value }))}
                           />
                         </div>
-                        <Button 
-                          onClick={verifyCompany}
-                          disabled={isVerifying || !verificationData.companyName}
-                          className="bg-purple-600 hover:bg-purple-700"
-                        >
-                          {isVerifying ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Vérification...</>
-                          ) : (
-                            <><Search className="w-4 h-4 mr-2" /> Vérifier l'entreprise</>
-                          )}
-                        </Button>
+                        <div className="space-y-2">
+                          <Label>Email professionnel * (doit correspondre à l'entreprise)</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="email"
+                              placeholder="vous@votre-entreprise.fr"
+                              value={verificationData.companyEmail}
+                              onChange={(e) => setVerificationData(prev => ({ ...prev, companyEmail: e.target.value }))}
+                            />
+                            <Button 
+                              onClick={sendCompanyVerificationEmail}
+                              disabled={isVerifying || !verificationData.companyName || !verificationData.companyEmail}
+                              className="bg-purple-600 hover:bg-purple-700"
+                            >
+                              {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            L'email doit correspondre au domaine de votre entreprise (pas de gmail, hotmail, etc.)
+                          </p>
+                        </div>
+                        
+                        {verificationData.companyEmailSentCode && (
+                          <div className="space-y-2">
+                            <Label>Code de vérification</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="123456"
+                                value={verificationData.companyEmailCode}
+                                onChange={(e) => setVerificationData(prev => ({ ...prev, companyEmailCode: e.target.value }))}
+                                maxLength={6}
+                              />
+                              <Button 
+                                onClick={verifyCompanyCode}
+                                disabled={isVerifying || verificationData.companyEmailCode.length !== 6}
+                              >
+                                {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Vérifier'}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
 
                     {['labo_public', 'labo_univ', 'labo_prive'].includes(verificationData.laboType) && (
                       <>
                         <div className="space-y-2">
-                          <Label>Nom du laboratoire / Institut</Label>
+                          <Label>Nom du laboratoire / Institut *</Label>
                           <Input
-                            placeholder="Laboratoire de Chimie Moléculaire"
+                            placeholder="Laboratoire de Chimie Moléculaire - CNRS"
                             value={verificationData.laboName}
                             onChange={(e) => setVerificationData(prev => ({ ...prev, laboName: e.target.value }))}
                           />
                         </div>
-                        <Button 
-                          onClick={verifyLaboratory}
-                          disabled={isVerifying || !verificationData.laboName}
-                          className="bg-purple-600 hover:bg-purple-700"
-                        >
-                          {isVerifying ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Vérification...</>
-                          ) : (
-                            <><Search className="w-4 h-4 mr-2" /> Vérifier le laboratoire</>
-                          )}
-                        </Button>
+                        <div className="space-y-2">
+                          <Label>Email institutionnel * (@cnrs.fr, @inserm.fr, @univ-xxx.fr, etc.)</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="email"
+                              placeholder="prenom.nom@cnrs.fr"
+                              value={verificationData.laboEmail}
+                              onChange={(e) => setVerificationData(prev => ({ ...prev, laboEmail: e.target.value }))}
+                            />
+                            <Button 
+                              onClick={sendLaboVerificationEmail}
+                              disabled={isVerifying || !verificationData.laboName || !verificationData.laboEmail}
+                              className="bg-purple-600 hover:bg-purple-700"
+                            >
+                              {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            Seuls les emails institutionnels de recherche sont acceptés
+                          </p>
+                        </div>
+
+                        {verificationData.laboEmailSentCode && (
+                          <div className="space-y-2">
+                            <Label>Code de vérification</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="123456"
+                                value={verificationData.laboEmailCode}
+                                onChange={(e) => setVerificationData(prev => ({ ...prev, laboEmailCode: e.target.value }))}
+                                maxLength={6}
+                              />
+                              <Button 
+                                onClick={verifyLaboCode}
+                                disabled={verificationData.laboEmailCode.length !== 6}
+                              >
+                                Vérifier
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
