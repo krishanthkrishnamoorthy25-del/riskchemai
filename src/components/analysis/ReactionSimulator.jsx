@@ -814,26 +814,95 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
                       )}
                     </div>
                     {result.data.documentation_sources?.length > 0 && (
-                      <div className="space-y-1 mt-2">
-                        {result.data.documentation_sources.map((src, i) => (
-                          <div key={i} className="text-xs text-slate-600 flex items-start gap-1">
-                            <BookOpen className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                            <span>
-                              {src.authors && <span>{src.authors}. </span>}
-                              <span className="italic">{src.title}</span>
-                              {src.journal && <span>. {src.journal}</span>}
-                              {src.year && <span> ({src.year})</span>}
-                              {src.doi && (
-                                <a href={`https://doi.org/${src.doi}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-600 hover:underline">
-                                  DOI: {src.doi}
-                                </a>
-                              )}
-                            </span>
+                            <div className="space-y-1 mt-2">
+                              {result.data.documentation_sources.map((src, i) => (
+                                <div key={i} className="text-xs text-slate-600 flex items-start gap-1">
+                                  <BookOpen className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                  <span>
+                                    {src.authors && <span>{src.authors}. </span>}
+                                    <span className="italic">{src.title}</span>
+                                    {src.journal && <span>. {src.journal}</span>}
+                                    {src.year && <span> ({src.year})</span>}
+                                    {src.doi && (
+                                      <a href={`https://doi.org/${src.doi}`} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-600 hover:underline">
+                                        DOI: {src.doi}
+                                      </a>
+                                    )}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Theoretical Proposals when reaction not documented */}
+                        {!result.data.reaction_documented && result.data.theoretical_proposals?.length > 0 && (
+                          <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                            <div className="flex items-center gap-2 mb-3">
+                              <HelpCircle className="w-5 h-5 text-indigo-600" />
+                              <span className="font-medium text-indigo-800">Propositions théoriques (à vérifier)</span>
+                            </div>
+                            <p className="text-xs text-indigo-600 mb-3">
+                              Aucune réaction documentée trouvée. Voici des mécanismes plausibles basés sur l'analyse chimique des réactifs :
+                            </p>
+                            <div className="space-y-3">
+                              {result.data.theoretical_proposals.map((proposal, i) => (
+                                <div key={i} className="p-3 bg-white rounded-lg border border-indigo-200">
+                                  <div className="flex items-start justify-between mb-2">
+                                    <span className="font-semibold text-slate-900">{proposal.mechanism_type}</span>
+                                    <Badge className={
+                                      proposal.plausibility === 'haute' ? 'bg-emerald-100 text-emerald-700' :
+                                      proposal.plausibility === 'moyenne' ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-slate-100 text-slate-600'
+                                    }>
+                                      Plausibilité {proposal.plausibility}
+                                    </Badge>
+                                  </div>
+
+                                  <p className="text-sm text-slate-700 mb-2">{proposal.chemical_rationale}</p>
+
+                                  {proposal.reactive_sites?.length > 0 && (
+                                    <div className="mb-2">
+                                      <span className="text-xs font-medium text-slate-500">Sites réactifs :</span>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {proposal.reactive_sites.map((site, j) => (
+                                          <Badge key={j} variant="outline" className="text-xs">{site}</Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {proposal.expected_products?.length > 0 && (
+                                    <div className="mb-2">
+                                      <span className="text-xs font-medium text-slate-500">Produits attendus :</span>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {proposal.expected_products.map((prod, j) => (
+                                          <Badge key={j} className="bg-emerald-50 text-emerald-700 text-xs">{prod}</Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {proposal.required_conditions && (
+                                    <p className="text-xs text-blue-600">
+                                      <span className="font-medium">Conditions requises :</span> {proposal.required_conditions}
+                                    </p>
+                                  )}
+
+                                  {proposal.warnings && (
+                                    <p className="text-xs text-amber-600 mt-2 flex items-start gap-1">
+                                      <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                      {proposal.warnings}
+                                    </p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            <p className="text-xs text-red-600 mt-3 font-medium">
+                              ⚠️ Ces propositions sont des HYPOTHÈSES THÉORIQUES et doivent être validées par un chimiste qualifié.
+                            </p>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                        )}
 
                   {/* Reaction Type */}
                   <div className="p-4 bg-purple-50 rounded-lg">
