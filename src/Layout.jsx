@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import Navbar from '@/components/common/Navbar';
 import CookieBanner from '@/components/common/CookieBanner';
 import AccessibilityPanel from '@/components/common/AccessibilityPanel';
+import { LanguageProvider } from '@/components/common/LanguageSelector';
 import { Toaster } from 'sonner';
 
 // Theme Context
@@ -24,6 +25,7 @@ export default function Layout({ children, currentPageName }) {
   const toggleTheme = () => setIsDark(!isDark);
 
   return (
+    <LanguageProvider>
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
       <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
         <style>{`
@@ -86,5 +88,6 @@ export default function Layout({ children, currentPageName }) {
         <Toaster position="top-right" richColors theme={isDark ? 'dark' : 'light'} />
       </div>
     </ThemeContext.Provider>
+    </LanguageProvider>
   );
 }

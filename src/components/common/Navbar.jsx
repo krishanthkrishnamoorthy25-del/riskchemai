@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, Sparkles } from 'lucide-react';
+import { FlaskConical, Menu, X, LogOut, User, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import LanguageSelector from './LanguageSelector';
 
 export default function Navbar({ isDark = false, toggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(false);

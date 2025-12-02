@@ -350,11 +350,11 @@ Pour chaque actualité, fournis:
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(SOURCES).map(([key, source]) => (
-              <div key={key} className="p-4 bg-slate-50 rounded-lg text-center">
+              <div key={key} className="p-4 bg-slate-100 rounded-lg text-center border border-slate-200">
                 <div className={`w-12 h-12 ${source.color} rounded-full flex items-center justify-center mx-auto mb-2`}>
                   <span className="text-white font-bold text-sm">{source.label.charAt(0)}</span>
                 </div>
-                <p className="font-medium text-slate-800">{source.label}</p>
+                <p className="font-semibold text-slate-900">{source.label}</p>
               </div>
             ))}
           </div>
