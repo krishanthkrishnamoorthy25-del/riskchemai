@@ -12,7 +12,8 @@ import {
   RefreshCw,
   XCircle,
   Sparkles,
-  Lock
+  Lock,
+  ArrowUpCircle
 } from 'lucide-react';
 import { format, addMonths, addYears, isAfter, isBefore } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -30,10 +31,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { base44 } from '@/api/base44Client';
+import PlanUpgradeModal from './PlanUpgradeModal';
 
 export default function SubscriptionManager({ subscription, onUpdate }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   if (!subscription) return null;
 
@@ -113,6 +116,26 @@ export default function SubscriptionManager({ subscription, onUpdate }) {
       if (onUpdate) onUpdate();
     } catch (error) {
       toast.error('Erreur lors de la réactivation');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpgrade = async (newPlan, verificationData) => {
+    setIsUpdating(true);
+    try {
+      await base44.entities.Subscription.update(subscription.id, {
+        plan: newPlan,
+        status: 'active',
+        verification_data: verificationData,
+        verified_at: new Date().toISOString(),
+        current_period_start: new Date().toISOString(),
+        current_period_end: addMonths(new Date(), 1).toISOString(),
+        auto_renew: true
+      });
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      throw error;
     } finally {
       setIsUpdating(false);
     }
@@ -336,6 +359,19 @@ export default function SubscriptionManager({ subscription, onUpdate }) {
           </div>
         )}
 
+        {/* Upgrade Button */}
+        {subscription.plan !== 'enterprise' && subscription.status !== 'cancelled' && (
+          <div className="pt-4 border-t border-slate-200">
+            <Button 
+              onClick={() => setShowUpgradeModal(true)}
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 gap-2"
+            >
+              <ArrowUpCircle className="w-4 h-4" />
+              Passer à un plan supérieur
+            </Button>
+          </div>
+        )}
+
         {/* Usage Stats */}
         <div className="pt-4 border-t border-slate-200">
           <p className="text-sm font-medium text-slate-700 mb-3">Utilisation ce mois</p>
@@ -355,6 +391,15 @@ export default function SubscriptionManager({ subscription, onUpdate }) {
           </div>
         </div>
       </CardContent>
+
+      {/* Upgrade Modal */}
+      <PlanUpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        currentPlan={subscription.plan}
+        userEmail={subscription.user_email}
+        onUpgrade={handleUpgrade}
+      />
     </Card>
   );
 }
