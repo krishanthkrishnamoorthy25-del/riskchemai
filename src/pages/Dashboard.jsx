@@ -18,6 +18,7 @@ import ChemicalSafetyGuide from '@/components/analysis/ChemicalSafetyGuide';
 import IncompatibilityMatrix from '@/components/analysis/IncompatibilityMatrix';
 import AdvancedRiskAnalysis from '@/components/analysis/AdvancedRiskAnalysis';
 import SimplifiedSDS from '@/components/analysis/SimplifiedSDS';
+import AnalysisChat from '@/components/analysis/AnalysisChat';
 import GasDetectionAlert from '@/components/analysis/GasDetectionAlert';
 import ExplosionRiskAlert from '@/components/analysis/ExplosionRiskAlert';
 import SubstanceClassification from '@/components/analysis/SubstanceClassification';
@@ -667,6 +668,9 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             {/* Guide de manipulation sécurisée */}
             <ChemicalSafetyGuide substances={analysisResults} />
             
+            {/* Chat pour questions supplémentaires */}
+            <AnalysisChat substances={analysisResults} />
+
             {/* FDS simplifiées pour chaque substance */}
             {analysisResults.length > 0 && (
               <div className="grid md:grid-cols-2 gap-4">
