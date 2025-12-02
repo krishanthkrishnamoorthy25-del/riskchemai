@@ -487,31 +487,14 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
 </body>
 </html>`;
 
-      // Créer un iframe caché pour l'impression
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = 'none';
-      document.body.appendChild(iframe);
-      
-      const iframeDoc = iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(htmlContent);
-      iframeDoc.close();
-      
-      // Attendre le chargement puis lancer l'impression
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow.print();
-          // Nettoyer après impression
-          setTimeout(() => {
-            document.body.removeChild(iframe);
-          }, 1000);
-        }, 250);
-      };
+      // Télécharger directement en HTML (ouvrable dans Word/navigateur)
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${fileName}.html`;
+      link.click();
+      URL.revokeObjectURL(url);
     }
   };
 
