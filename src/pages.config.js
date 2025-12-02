@@ -14,6 +14,8 @@ import Sources from './pages/Sources';
 import Disclaimer from './pages/Disclaimer';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import About from './pages/About';
+import Changelog from './pages/Changelog';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +36,8 @@ export const PAGES = {
     "Disclaimer": Disclaimer,
     "Contact": Contact,
     "Admin": Admin,
+    "About": About,
+    "Changelog": Changelog,
 }
 
 export const pagesConfig = {
