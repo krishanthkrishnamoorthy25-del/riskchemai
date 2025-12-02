@@ -13,6 +13,7 @@ import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import TrustBadges from '@/components/landing/TrustBadges';
 import LiveStats from '@/components/landing/LiveStats';
 import Footer from '@/components/landing/Footer';
+import ScrollToTopButton from '@/components/landing/ScrollToTopButton';
 
 export default function Home() {
   return (
@@ -31,6 +32,7 @@ export default function Home() {
       <SecuritySection />
       <PricingSection />
       <Footer />
+      <ScrollToTopButton />
     </div>
   );
 }
