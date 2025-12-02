@@ -203,6 +203,21 @@ NE FOURNIS QUE DES INFORMATIONS DES SOURCES AUTORISÉES.`;
             provenance_score: { type: "number" },
             provenance_details: { type: "string" },
             reaction_documented: { type: "boolean" },
+            theoretical_proposals: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  mechanism_type: { type: "string" },
+                  plausibility: { type: "string", enum: ["haute", "moyenne", "faible"] },
+                  chemical_rationale: { type: "string" },
+                  reactive_sites: { type: "array", items: { type: "string" } },
+                  expected_products: { type: "array", items: { type: "string" } },
+                  required_conditions: { type: "string" },
+                  warnings: { type: "string" }
+                }
+              }
+            },
             documentation_sources: {
               type: "array",
               items: {
