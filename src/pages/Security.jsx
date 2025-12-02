@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Shield, Lock, Eye, Server, Key, AlertTriangle,
   CheckCircle2, FileText, Globe, Database, Zap,
-  RefreshCw, Users, Mail, Clock, Code, Bug
+  RefreshCw, Users, Mail, Clock, Code, Bug, CreditCard
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,8 +17,7 @@ const securityFeatures = [
     features: [
       { name: 'Authentification sécurisée', desc: 'Login via OAuth2 avec tokens JWT', status: 'active' },
       { name: 'Sessions chiffrées', desc: 'Cookies sécurisés HttpOnly + SameSite', status: 'active' },
-      { name: 'Rate limiting', desc: 'Protection anti-brute force (100 req/min)', status: 'active' },
-      { name: 'CAPTCHA intelligent', desc: 'Détection automatique des bots', status: 'active' },
+      { name: 'Rate limiting', desc: 'Protection anti-brute force', status: 'active' },
       { name: '2FA (bientôt)', desc: 'Double authentification TOTP', status: 'planned' }
     ]
   },
@@ -27,11 +26,20 @@ const securityFeatures = [
     icon: Database,
     color: 'bg-emerald-500',
     features: [
-      { name: 'Chiffrement AES-256', desc: 'Données sensibles chiffrées au repos', status: 'active' },
-      { name: 'TLS 1.3', desc: 'Communications chiffrées de bout en bout', status: 'active' },
+      { name: 'Chiffrement TLS', desc: 'Communications chiffrées en transit', status: 'active' },
       { name: 'Pas de stockage analyses', desc: 'Résultats non conservés (RGPD)', status: 'active' },
-      { name: 'Hash Argon2id', desc: 'Mots de passe hashés avec Argon2id', status: 'active' },
-      { name: 'Backup chiffrés', desc: 'Sauvegardes quotidiennes cryptées', status: 'active' }
+      { name: 'Données hébergées UE', desc: 'Serveurs en Union Européenne', status: 'active' }
+    ]
+  },
+  {
+    category: 'Paiements sécurisés',
+    icon: CreditCard,
+    color: 'bg-indigo-500',
+    features: [
+      { name: 'Stripe PCI-DSS Level 1', desc: 'Aucune donnée bancaire stockée chez nous', status: 'active' },
+      { name: 'Tokenisation', desc: 'Cartes bancaires jamais transmises à nos serveurs', status: 'active' },
+      { name: '3D Secure', desc: 'Authentification forte des paiements', status: 'active' },
+      { name: 'Factures sécurisées', desc: 'Données de facturation chiffrées par Stripe', status: 'active' }
     ]
   },
   {
