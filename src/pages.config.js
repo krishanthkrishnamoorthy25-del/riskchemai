@@ -16,6 +16,9 @@ import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import About from './pages/About';
 import Changelog from './pages/Changelog';
+import UseCases from './pages/UseCases';
+import WhyUs from './pages/WhyUs';
+import Demo from './pages/Demo';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +41,9 @@ export const PAGES = {
     "Admin": Admin,
     "About": About,
     "Changelog": Changelog,
+    "UseCases": UseCases,
+    "WhyUs": WhyUs,
+    "Demo": Demo,
 }
 
 export const pagesConfig = {
