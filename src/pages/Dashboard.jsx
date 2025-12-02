@@ -18,6 +18,9 @@ import ChemicalSafetyGuide from '@/components/analysis/ChemicalSafetyGuide';
 import IncompatibilityMatrix from '@/components/analysis/IncompatibilityMatrix';
 import AdvancedRiskAnalysis from '@/components/analysis/AdvancedRiskAnalysis';
 import SimplifiedSDS from '@/components/analysis/SimplifiedSDS';
+import GasDetectionAlert from '@/components/analysis/GasDetectionAlert';
+import ExplosionRiskAlert from '@/components/analysis/ExplosionRiskAlert';
+import SubstanceClassification from '@/components/analysis/SubstanceClassification';
 import OnboardingTour from '@/components/common/OnboardingTour';
 import NotificationCenter from '@/components/common/NotificationCenter';
 import GlobalSearch from '@/components/common/GlobalSearch';
@@ -514,6 +517,10 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             animate={{ opacity: 1, y: 0 }}
             className="mb-8 space-y-6"
           >
+            {/* Alertes critiques en premier */}
+            <GasDetectionAlert substances={analysisResults} />
+            <ExplosionRiskAlert substances={analysisResults} />
+            
             {/* Tableau RAMPE principal */}
             <RampeTable 
               results={analysisResults} 
@@ -521,6 +528,9 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
               onQuickSearch={canAnalyze() ? handleQuickSearch : null}
               isSearching={isQuickSearching}
             />
+            
+            {/* Classification des produits */}
+            <SubstanceClassification substances={analysisResults} />
             
             {/* Analyse de risques avancée */}
             <AdvancedRiskAnalysis substances={analysisResults} />
