@@ -91,6 +91,11 @@ export default function Navbar({ isDark = false, toggleTheme }) {
     }
   ];
 
+  const userMenuLinks = [
+    { name: 'Dashboard', page: 'Dashboard' },
+    { name: 'Mon compte', page: 'Account' }
+  ];
+
   const isLandingPage = location.pathname === '/' || location.pathname === '/Home';
   const isDarkNav = isLandingPage && !isScrolled;
 
@@ -234,34 +239,31 @@ export default function Navbar({ isDark = false, toggleTheme }) {
             )}
 
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className={`gap-2 ${isDarkNav ? 'text-white hover:bg-white/10' : ''}`}>
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-medium">
-                      {user.full_name?.[0] || user.email?.[0]?.toUpperCase()}
-                    </div>
-                    <span className="max-w-32 truncate">{user.full_name || user.email}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <Link to={createPageUrl('Dashboard')} className="cursor-pointer">
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to={createPageUrl('Account')} className="cursor-pointer">
-                      <User className="w-4 h-4 mr-2" />
-                      Mon compte
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => base44.auth.logout()} className="text-red-600 cursor-pointer">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Déconnexion
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className={`gap-2 ${isDarkNav ? 'text-white hover:bg-white/10' : ''}`}>
+                      <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-medium">
+                        {user.full_name?.[0] || user.email?.[0]?.toUpperCase()}
+                      </div>
+                      <span className="max-w-32 truncate">{user.full_name || user.email}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {userMenuLinks.map((link) => (
+                      <DropdownMenuItem key={link.page} asChild>
+                        <Link to={createPageUrl(link.page)} className="cursor-pointer">
+                          {link.name === 'Mon compte' && <User className="w-4 h-4 mr-2" />}
+                          {link.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => base44.auth.logout()} className="text-red-600 cursor-pointer">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Déconnexion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
             ) : (
               <>
                 <Button 
