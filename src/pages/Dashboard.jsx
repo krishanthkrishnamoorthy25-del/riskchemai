@@ -400,7 +400,11 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
 
         {/* Stats */}
         <div className="mb-8">
-          <DashboardStats subscription={subscription} analysisLogs={analysisLogs || []} />
+          <DashboardStats 
+            subscription={subscription} 
+            analysisLogs={analysisLogs || []} 
+            simulationsCount={subscription?.simulations_count_this_month || 0}
+          />
         </div>
 
         {/* Access Warning */}
