@@ -28,7 +28,7 @@ export default function ScrollToTopButton() {
           className="fixed bottom-20 right-4 z-50 w-10 h-10 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-colors"
           title="Retour en haut"
         >
-          <ArrowUp className="w-5 h-5" />
+          <ArrowUp className="w-4 h-4" />
         </motion.button>
       )}
     </AnimatePresence>
