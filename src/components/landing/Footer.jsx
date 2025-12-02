@@ -35,11 +35,11 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                 <FlaskConical className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">ChemRisk Pro</span>
+              <span className="text-xl font-bold text-white">ChemRisk <span className="text-emerald-400">AI</span></span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed">
               Plateforme d'analyse de risques chimiques par IA. 
@@ -118,10 +118,10 @@ export default function Footer() {
           </div>
           <div className="text-center">
             <p className="text-slate-600 text-xs">
-              © {currentYear} ChemRisk Pro — Une solution développée en France 🇫🇷
+              © {currentYear} ChemRisk AI — Une solution développée en France 🇫🇷
             </p>
             <p className="text-slate-700 text-[10px] mt-1">
-              ChemRisk Pro® est une marque déposée. Tous droits réservés.
+              ChemRisk AI® est une marque déposée. Tous droits réservés.
             </p>
           </div>
         </div>

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, ChevronDown } from 'lucide-react';
+import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, ChevronDown, Search, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
@@ -13,11 +13,50 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const searchableItems = [
+  { label: 'Identification automatique', page: 'Features', section: '#identification' },
+  { label: 'Classification GHS', page: 'Features', section: '#ghs' },
+  { label: 'Tableau RAMPE', page: 'Features', section: '#rampe' },
+  { label: 'Codes H & P', page: 'Features', section: '#codes-hp' },
+  { label: 'Export PDF & CSV', page: 'Features', section: '' },
+  { label: 'Sources vérifiées', page: 'Sources', section: '' },
+  { label: 'Simulateur de réactions', page: 'Dashboard', section: '' },
+  { label: 'Tarifs', page: 'Pricing', section: '' },
+  { label: 'Sécurité', page: 'Security', section: '' },
+  { label: 'Contact', page: 'Contact', section: '' },
+];
+
 export default function Navbar({ isDark = false, toggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const filteredSearch = searchQuery.trim() 
+    ? searchableItems.filter(item => 
+        item.label.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
+  const handleSearchSelect = (item) => {
+    navigate(createPageUrl(item.page) + item.section);
+    setSearchOpen(false);
+    setSearchQuery('');
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -66,12 +105,12 @@ export default function Navbar({ isDark = false, toggleTheme }) {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+          <Link to={createPageUrl('Home')} className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
               <FlaskConical className="w-5 h-5 text-white" />
             </div>
             <span className={`text-xl font-bold ${isDarkNav ? 'text-white' : 'text-slate-900'}`}>
-              ChemRisk Pro
+              ChemRisk <span className="text-emerald-500">AI</span>
             </span>
           </Link>
 
@@ -115,12 +154,75 @@ export default function Navbar({ isDark = false, toggleTheme }) {
           </div>
 
           {/* Actions */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
+            {/* Search Bar */}
+            <div ref={searchRef} className="relative">
+              <div 
+                onClick={() => setSearchOpen(true)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all ${
+                  isDarkNav 
+                    ? 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20' 
+                    : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200'
+                }`}
+              >
+                <Search className="w-4 h-4" />
+                <span className="text-sm w-32">Rechercher...</span>
+                <kbd className={`text-xs px-1.5 py-0.5 rounded ${isDarkNav ? 'bg-white/10' : 'bg-white'}`}>⌘K</kbd>
+              </div>
+
+              <AnimatePresence>
+                {searchOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full mt-2 right-0 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50"
+                  >
+                    <div className="p-3 border-b border-slate-100 dark:border-slate-700">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                        <Search className="w-4 h-4 text-slate-400" />
+                        <input
+                          type="text"
+                          placeholder="Rechercher une fonctionnalité..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {filteredSearch.length > 0 ? (
+                        filteredSearch.map((item, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleSearchSelect(item)}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                          >
+                            <Sparkles className="w-4 h-4 text-emerald-500" />
+                            <span className="text-sm text-slate-700 dark:text-slate-200">{item.label}</span>
+                          </button>
+                        ))
+                      ) : searchQuery ? (
+                        <div className="px-4 py-6 text-center text-sm text-slate-400">
+                          Aucun résultat trouvé
+                        </div>
+                      ) : (
+                        <div className="px-4 py-3 text-xs text-slate-400">
+                          Tapez pour rechercher...
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {/* Theme Toggle */}
             {toggleTheme && (
               <button
                 onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-2.5 rounded-xl transition-all ${
                   isDarkNav 
                     ? 'text-slate-300 hover:text-white hover:bg-white/10' 
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -130,7 +232,7 @@ export default function Navbar({ isDark = false, toggleTheme }) {
                 {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
             )}
-            
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -165,14 +267,15 @@ export default function Navbar({ isDark = false, toggleTheme }) {
                 <Button 
                   variant="ghost" 
                   onClick={() => base44.auth.redirectToLogin()}
-                  className={isDarkNav ? 'text-white hover:bg-white/10' : ''}
+                  className={`rounded-xl font-medium ${isDarkNav ? 'text-white hover:bg-white/10' : 'hover:bg-slate-100'}`}
                 >
                   Connexion
                 </Button>
                 <Button 
                   onClick={() => base44.auth.redirectToLogin()}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/25 font-medium px-5"
                 >
+                  <Sparkles className="w-4 h-4 mr-2" />
                   Essai gratuit
                 </Button>
               </>
