@@ -14,6 +14,10 @@ import AnalysisHistory from '@/components/dashboard/AnalysisHistory';
 import ChemicalAnalysisForm from '@/components/analysis/ChemicalAnalysisForm';
 import RampeTable from '@/components/analysis/RampeTable';
 import ReactionSimulator from '@/components/analysis/ReactionSimulator';
+import OnboardingTour from '@/components/common/OnboardingTour';
+import NotificationCenter from '@/components/common/NotificationCenter';
+import GlobalSearch from '@/components/common/GlobalSearch';
+import KeyboardShortcuts from '@/components/common/KeyboardShortcuts';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -21,7 +25,24 @@ export default function Dashboard() {
   const [analysisResults, setAnalysisResults] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isQuickSearching, setIsQuickSearching] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const queryClient = useQueryClient();
+
+  // Check if onboarding should be shown
+  useEffect(() => {
+    const onboardingCompleted = localStorage.getItem('onboarding_completed');
+    if (!onboardingCompleted) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleShortcut = (action) => {
+    if (action === 'new-analysis') {
+      setShowAnalysisForm(true);
+    } else if (action === 'simulator') {
+      document.querySelector('[data-tour="simulator"]')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const loadUser = async () => {
@@ -370,6 +391,14 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Onboarding Tour */}
+      {showOnboarding && (
+        <OnboardingTour onComplete={() => setShowOnboarding(false)} />
+      )}
+      
+      {/* Keyboard Shortcuts */}
+      <KeyboardShortcuts onShortcut={handleShortcut} />
+      
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -379,7 +408,9 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             </h1>
             <p className="text-slate-500">Bienvenue sur votre tableau de bord ChemRisk Pro</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <GlobalSearch onAction={handleShortcut} />
+            <NotificationCenter subscription={subscription} />
             <Link to={createPageUrl('Account')}>
               <Button variant="outline" className="gap-2">
                 <Settings className="w-4 h-4" />
@@ -390,6 +421,7 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
               <Button 
                 onClick={() => setShowAnalysisForm(!showAnalysisForm)}
                 className="bg-emerald-500 hover:bg-emerald-600 gap-2"
+                data-tour="new-analysis"
               >
                 <Plus className="w-4 h-4" />
                 Nouvelle analyse
