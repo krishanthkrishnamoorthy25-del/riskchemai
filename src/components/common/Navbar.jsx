@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, Menu, X, LogOut, User, Moon, Sun } from 'lucide-react';
+import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
@@ -90,6 +90,9 @@ export default function Navbar({ isDark = false, toggleTheme }) {
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-3">
+            {/* Language Selector */}
+            <LanguageSelector />
+
             {/* Theme Toggle */}
             {toggleTheme && (
               <button

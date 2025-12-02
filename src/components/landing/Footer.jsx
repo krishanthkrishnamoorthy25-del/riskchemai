@@ -8,14 +8,11 @@ export default function Footer() {
 
   const links = {
     product: [
-      { name: 'Fonctionnalités', page: 'Features' },
-      { name: 'Tarifs', page: 'Pricing' },
-      { name: 'Dashboard', page: 'Dashboard' },
-      { name: 'Sources scientifiques', page: 'Sources' },
-      { name: 'Cas d\'usage', page: 'UseCases' },
-      { name: 'Pourquoi nous ?', page: 'WhyUs' },
-      { name: 'Démonstration', page: 'Demo' }
-    ],
+        { name: 'Fonctionnalités', page: 'Features' },
+        { name: 'Tarifs', page: 'Pricing' },
+        { name: 'Actualités', page: 'News' },
+        { name: 'Sécurité', page: 'Security' }
+      ],
     legal: [
       { name: 'Mentions légales', page: 'Legal' },
       { name: 'Politique de confidentialité', page: 'Privacy' },
@@ -25,11 +22,8 @@ export default function Footer() {
       { name: 'Limites du service', page: 'Limitations' }
     ],
     support: [
-      { name: 'Centre d\'aide', page: 'Support' },
-      { name: 'Sécurité', page: 'Security' },
-      { name: 'Contact', page: 'Contact' },
-      { name: 'À propos', page: 'About' },
-      { name: 'Changelog', page: 'Changelog' }
+        { name: 'Contact', page: 'Contact' },
+        { name: 'À propos', page: 'About' }
       ]
   };
 
