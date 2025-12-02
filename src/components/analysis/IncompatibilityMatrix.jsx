@@ -185,7 +185,6 @@ export default function IncompatibilityMatrix({ substances = [] }) {
     if (!sanitizedReactant) return;
     
     // Vérifier le filtre anti-abus
-    const { checkForAbuse } = await import('./AbuseFilter');
     const abuseCheck = checkForAbuse(sanitizedReactant);
     if (abuseCheck.blocked) {
       toast.error('Cette substance n\'est pas autorisée');
