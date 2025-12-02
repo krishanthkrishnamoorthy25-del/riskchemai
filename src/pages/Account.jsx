@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -18,10 +19,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { User, CreditCard, Shield, Trash2, Download, Loader2, CheckCircle } from 'lucide-react';
+import { User, CreditCard, Shield, Trash2, Download, Loader2, CheckCircle, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import SubscriptionManager from '@/components/account/SubscriptionManager';
 
 export default function Account() {
   const [user, setUser] = useState(null);
@@ -50,7 +52,9 @@ export default function Account() {
     loadUser();
   }, []);
 
-  const { data: subscription } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data: subscription, refetch: refetchSubscription } = useQuery({
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
       const subs = await base44.entities.Subscription.filter({ user_email: user.email });
@@ -58,6 +62,10 @@ export default function Account() {
     },
     enabled: !!user?.email
   });
+
+  const handleSubscriptionUpdate = () => {
+    refetchSubscription();
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -117,8 +125,24 @@ export default function Account() {
           <p className="text-slate-500">Gérez vos informations personnelles et votre abonnement</p>
         </div>
 
-        <div className="space-y-6">
-          {/* Profile */}
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="profile" className="gap-2">
+              <User className="w-4 h-4" />
+              Profil
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="gap-2">
+              <CreditCard className="w-4 h-4" />
+              Abonnement
+            </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <Shield className="w-4 h-4" />
+              Sécurité
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile">
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -164,73 +188,18 @@ export default function Account() {
               </div>
             </CardContent>
           </Card>
+          </TabsContent>
 
-          {/* Subscription */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Abonnement</CardTitle>
-                  <CardDescription>Gérez votre plan et facturation</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {subscription ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-slate-900">
-                        Plan {subscription.plan === 'trial' ? 'Essai gratuit' : 
-                              subscription.plan === 'standard' ? 'Standard' : 'Entreprise'}
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        {subscription.status === 'active' ? 'Actif' :
-                         subscription.status === 'trialing' ? 'Période d\'essai' :
-                         subscription.status === 'past_due' ? 'Paiement en retard' : 'Inactif'}
-                      </p>
-                    </div>
-                    <Badge className={
-                      subscription.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                      subscription.status === 'trialing' ? 'bg-blue-100 text-blue-700' :
-                      'bg-red-100 text-red-700'
-                    }>
-                      {subscription.plan === 'trial' ? '0€' :
-                       subscription.plan === 'standard' ? '29€/mois' : '89€/mois'}
-                    </Badge>
-                  </div>
+          {/* Subscription Tab */}
+          <TabsContent value="subscription">
+            <SubscriptionManager 
+              subscription={subscription} 
+              onUpdate={handleSubscriptionUpdate}
+            />
+          </TabsContent>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-slate-500">Analyses ce mois</p>
-                      <p className="text-xl font-semibold text-slate-900">
-                        {subscription.analyses_count_this_month || 0}
-                      </p>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-slate-500">Membre depuis</p>
-                      <p className="text-xl font-semibold text-slate-900">
-                        {format(new Date(subscription.created_date), 'd MMM yyyy', { locale: fr })}
-                      </p>
-                    </div>
-                  </div>
-
-                  {subscription.plan !== 'enterprise' && (
-                    <Button variant="outline" className="w-full">
-                      Passer à un plan supérieur
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <p className="text-slate-500">Aucun abonnement actif</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Security & Privacy */}
+          {/* Security Tab */}
+          <TabsContent value="security">
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -246,7 +215,7 @@ export default function Account() {
             <CardContent className="space-y-4">
               <div className="p-4 bg-emerald-50 rounded-lg">
                 <p className="text-sm text-emerald-800">
-                  <strong>Rappel :</strong> ChemRisk Pro ne conserve jamais le contenu de vos analyses chimiques. 
+                  <strong>Rappel :</strong> ChemRisk AI ne conserve jamais le contenu de vos analyses chimiques. 
                   Seules vos informations de compte et les métadonnées anonymisées sont stockées.
                 </p>
               </div>
@@ -288,7 +257,8 @@ export default function Account() {
               </div>
             </CardContent>
           </Card>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
