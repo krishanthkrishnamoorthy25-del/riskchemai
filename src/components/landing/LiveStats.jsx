@@ -103,7 +103,7 @@ export default function LiveStats() {
 
         <div className="mt-8 text-center">
           <p className="text-slate-600 dark:text-slate-400 text-sm">
-            <span className="font-semibold text-emerald-600">ChemRisk Pro</span> — L'outil indispensable pour les professionnels HSE, chimistes et laboratoires
+            <span className="font-semibold text-emerald-600">ChemRisk AI</span> — L'outil indispensable pour les professionnels HSE, chimistes et laboratoires
           </p>
         </div>
       </div>
