@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,10 +26,17 @@ import {
   HelpCircle,
   Snowflake,
   Flame,
-  CheckCircle2
+  CheckCircle2,
+  History,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  X
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 export default function ReactionSimulator({ canSimulate = true, remainingAnalyses = Infinity, onSimulationComplete }) {
   const [activeTab, setActiveTab] = useState('chemistry');
@@ -37,6 +44,8 @@ export default function ReactionSimulator({ canSimulate = true, remainingAnalyse
   const [result, setResult] = useState(null);
   const [needsConditions, setNeedsConditions] = useState(false);
   const [pendingReaction, setPendingReaction] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState([]);
   
   // Chemistry state - multiple reactants with CAS
   const [reactants, setReactants] = useState([
@@ -56,6 +65,51 @@ export default function ReactionSimulator({ canSimulate = true, remainingAnalyse
   const [process, setProcess] = useState('');
   const [substrate, setSubstrate] = useState('');
   const [biosafety, setBiosafety] = useState('');
+
+  // Load history from sessionStorage on mount
+  useEffect(() => {
+    const savedHistory = sessionStorage.getItem('simulation_history');
+    if (savedHistory) {
+      setHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
+  // Save simulation to session history
+  const saveToHistory = (type, data, inputs) => {
+    const newEntry = {
+      id: Date.now(),
+      type,
+      data,
+      inputs,
+      timestamp: new Date().toISOString()
+    };
+    const updatedHistory = [newEntry, ...history].slice(0, 10); // Keep last 10
+    setHistory(updatedHistory);
+    sessionStorage.setItem('simulation_history', JSON.stringify(updatedHistory));
+  };
+
+  // Load a history entry
+  const loadFromHistory = (entry) => {
+    setResult({ type: entry.type, data: entry.data });
+    if (entry.type === 'chemistry' && entry.inputs?.reactants) {
+      setReactants(entry.inputs.reactants);
+      if (entry.inputs.conditions) {
+        setConditions(entry.inputs.conditions);
+      }
+    } else if (entry.type === 'biotech' && entry.inputs) {
+      setOrganism(entry.inputs.organism || '');
+      setProcess(entry.inputs.process || '');
+      setSubstrate(entry.inputs.substrate || '');
+      setBiosafety(entry.inputs.biosafety || '');
+    }
+    setShowHistory(false);
+  };
+
+  // Clear history
+  const clearHistory = () => {
+    setHistory([]);
+    sessionStorage.removeItem('simulation_history');
+  };
 
   const addReactant = () => {
     setReactants([...reactants, { name: '', cas: '' }]);
@@ -386,6 +440,8 @@ NE FOURNIS QUE DES INFORMATIONS DES SOURCES AUTORISÉES.`;
         setResult({ type: 'chemistry', data: response, partial: true });
       } else {
         setResult({ type: 'chemistry', data: response });
+        // Save to session history
+        saveToHistory('chemistry', response, { reactants: validReactants, conditions });
       }
 
       // Incrémenter le compteur d'utilisation
@@ -503,6 +559,8 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
       });
 
       setResult({ type: 'biotech', data: response });
+      // Save to session history
+      saveToHistory('biotech', response, { organism, process, substrate, biosafety });
 
       // Incrémenter le compteur d'utilisation
       if (onSimulationComplete) {
@@ -538,10 +596,76 @@ IMPORTANT: Base-toi sur des sources fiables et officielles.`;
   return (
     <Card className="border-slate-200">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Zap className="w-5 h-5 text-purple-600" />
-          Simulateur de Réactions & Biosécurité
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Zap className="w-5 h-5 text-purple-600" />
+            Simulateur de Réactions & Biosécurité
+          </CardTitle>
+          {history.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowHistory(!showHistory)}
+              className="gap-2"
+            >
+              <History className="w-4 h-4" />
+              Historique ({history.length})
+              {showHistory ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </Button>
+          )}
+        </div>
+        
+        {/* History Panel */}
+        <AnimatePresence>
+          {showHistory && history.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-slate-700">Simulations récentes (session)</p>
+                <Button variant="ghost" size="sm" onClick={clearHistory} className="text-xs text-slate-500 hover:text-red-500">
+                  <Trash2 className="w-3 h-3 mr-1" /> Effacer
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {history.map((entry) => (
+                  <button
+                    key={entry.id}
+                    onClick={() => loadFromHistory(entry)}
+                    className="w-full flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition-all text-left"
+                  >
+                    {entry.type === 'chemistry' ? (
+                      <FlaskConical className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                    ) : (
+                      <Dna className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-800 truncate">
+                        {entry.type === 'chemistry' 
+                          ? entry.inputs?.reactants?.map(r => r.name || r.cas).filter(Boolean).join(' + ') || 'Réaction'
+                          : entry.inputs?.organism || entry.inputs?.process || 'Analyse biotech'
+                        }
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {entry.data?.reaction_type || entry.data?.biosafety_level || 'Simulation'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-slate-400">
+                      <Clock className="w-3 h-3" />
+                      {format(new Date(entry.timestamp), 'HH:mm', { locale: fr })}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-slate-400 mt-3 text-center">
+                💡 L'historique est effacé à la déconnexion
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
