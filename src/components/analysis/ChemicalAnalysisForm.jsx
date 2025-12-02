@@ -22,8 +22,14 @@ export default function ChemicalAnalysisForm({ onSubmit, isLoading }) {
   };
 
   const updateSubstance = (index, field, value) => {
+    // SÉCURITÉ: Sanitize input - limite la longueur et supprime les caractères dangereux
+    const sanitizedValue = String(value)
+      .slice(0, 200) // Max 200 caractères
+      .replace(/<[^>]*>/g, '') // Supprime les balises HTML
+      .replace(/[<>\"\'`;]/g, ''); // Supprime les caractères dangereux
+    
     const updated = [...substances];
-    updated[index][field] = value;
+    updated[index][field] = sanitizedValue;
     setSubstances(updated);
   };
 

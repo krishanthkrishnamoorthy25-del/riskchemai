@@ -40,18 +40,24 @@ export default function Admin() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) {
+          base44.auth.redirectToLogin();
+          return;
+        }
+        const userData = await base44.auth.me();
+        // Check if admin - SÉCURITÉ: vérification stricte du rôle
+        if (!userData || userData.role !== 'admin') {
+          console.warn('Accès admin refusé pour:', userData?.email);
+          window.location.href = '/Dashboard';
+          return;
+        }
+        setUser(userData);
+      } catch (error) {
+        console.error('Erreur authentification admin:', error);
         base44.auth.redirectToLogin();
-        return;
       }
-      const userData = await base44.auth.me();
-      // Check if admin
-      if (userData.role !== 'admin') {
-        window.location.href = '/Dashboard';
-        return;
-      }
-      setUser(userData);
     };
     loadUser();
   }, []);

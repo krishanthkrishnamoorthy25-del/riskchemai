@@ -54,13 +54,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) {
+          base44.auth.redirectToLogin();
+          return;
+        }
+        const userData = await base44.auth.me();
+        if (!userData || !userData.email) {
+          console.error('Données utilisateur invalides');
+          base44.auth.redirectToLogin();
+          return;
+        }
+        setUser(userData);
+      } catch (error) {
+        console.error('Erreur chargement utilisateur:', error);
         base44.auth.redirectToLogin();
-        return;
       }
-      const userData = await base44.auth.me();
-      setUser(userData);
     };
     loadUser();
   }, []);

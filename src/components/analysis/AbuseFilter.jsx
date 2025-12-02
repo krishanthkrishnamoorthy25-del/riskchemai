@@ -1,28 +1,36 @@
 // Liste des termes interdits pour filtrer les requêtes suspectes
+// SÉCURITÉ: Liste étendue pour prévenir tout usage malveillant
 const BLOCKED_TERMS = [
   // Explosifs
   'explosif', 'explosive', 'bombe', 'détonateur', 'détonation', 'tnt', 'c4', 'rdx', 'petn',
   'nitroglycérine', 'nitroglycerin', 'dynamite', 'semtex', 'anfo', 'tatp', 'hmtd',
   'fulminant', 'fulminate', 'azoture', 'azide', 'perchlorate', 'picrique', 'picric',
+  'nitrocellulose', 'poudre noire', 'black powder', 'thermite', 'plastique c4',
+  'détonant', 'détonable', 'propergol', 'nitrate d\'ammonium explosif',
   
   // Armes chimiques
   'sarin', 'vx', 'novichok', 'tabun', 'soman', 'agent orange', 'ypérite', 'mustard gas',
   'gaz moutarde', 'lewisite', 'phosgène', 'phosgene', 'arme chimique', 'chemical weapon',
-  'agent neurotoxique', 'nerve agent', 'chloropicrine',
+  'agent neurotoxique', 'nerve agent', 'chloropicrine', 'agent vésicant', 'agent suffocant',
+  'gaz de combat', 'arme biologique', 'bioweapon',
   
   // Drogues / stupéfiants
   'méthamphétamine', 'methamphetamine', 'crystal meth', 'mdma', 'ecstasy',
   'lsd', 'lysergique', 'lysergic', 'héroïne', 'heroin', 'fentanyl', 'carfentanil',
   'cocaïne', 'cocaine', 'crack', 'ghb', 'kétamine', 'ketamine', 'pcp', 'angel dust',
   'amphétamine', 'amphetamine', 'speed', 'cathinone', 'méphedrone', 'mephedrone',
+  'dmt', 'psilocybine', 'opiacé synthétique', 'drogue de synthèse', 'nbome',
   
   // Poisons
   'ricine', 'ricin', 'abrine', 'botulique', 'botulinum', 'anthrax', 'cyanure',
   'cyanide', 'arsenic', 'thallium', 'polonium', 'aconit', 'aconitine',
+  'strychnine', 'curare', 'digitale létale', 'poison mortel',
   
-  // Termes de synthèse
+  // Termes de synthèse malveillante
   'synthèse clandestine', 'fabrication illégale', 'cook meth', 'make bomb',
-  'fabriquer explosif', 'recette drogue', 'drug recipe', 'how to make'
+  'fabriquer explosif', 'recette drogue', 'drug recipe', 'how to make',
+  'synthèse drogue', 'produire drogue', 'fabriquer drogue', 'home made explosive',
+  'fabrication bombe', 'recette explosive', 'poison fait maison', 'tuer quelqu\'un'
 ];
 
 // Termes qui déclenchent une alerte mais ne bloquent pas

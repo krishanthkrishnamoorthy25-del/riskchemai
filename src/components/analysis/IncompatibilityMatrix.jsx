@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { AlertTriangle, CheckCircle2, XCircle, HelpCircle, Zap, Plus, Trash2, RefreshCw, Loader2, Lightbulb } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 // Matrice de compatibilité simplifiée (basée sur CAMEO)
 const COMPATIBILITY_MATRIX = {
@@ -169,9 +170,27 @@ export default function IncompatibilityMatrix({ substances = [] }) {
     // Afficher quand même le formulaire pour ajouter des réactifs
   }
   
+  // SÉCURITÉ: Sanitize et valide les entrées utilisateur
+  const sanitizeReactantInput = (input) => {
+    return String(input)
+      .slice(0, 100)
+      .replace(/<[^>]*>/g, '')
+      .replace(/[<>\"\'`;]/g, '')
+      .trim();
+  };
+
   // Ajouter un réactif personnalisé
   const addCustomReactant = async () => {
-    if (!newReactant.trim()) return;
+    const sanitizedReactant = sanitizeReactantInput(newReactant);
+    if (!sanitizedReactant) return;
+    
+    // Vérifier le filtre anti-abus
+    const { checkForAbuse } = await import('./AbuseFilter');
+    const abuseCheck = checkForAbuse(sanitizedReactant);
+    if (abuseCheck.blocked) {
+      toast.error('Cette substance n\'est pas autorisée');
+      return;
+    }
     
     setIsAnalyzing(true);
     try {
@@ -194,7 +213,7 @@ Fournis:
       });
       
       setCustomReactants(prev => [...prev, {
-        name: response.name || newReactant,
+        name: response.name || sanitizedReactant,
         classes: response.classes || [],
         h_codes: response.h_codes || [],
         isCustom: true
@@ -204,7 +223,7 @@ Fournis:
       console.error('Error classifying reactant:', error);
       // Ajouter quand même sans classification
       setCustomReactants(prev => [...prev, {
-        name: newReactant,
+        name: sanitizedReactant,
         classes: [],
         h_codes: [],
         isCustom: true

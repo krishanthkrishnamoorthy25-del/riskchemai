@@ -73,19 +73,43 @@ export default function SubscriptionManager({ subscription, onUpdate }) {
     sendEmails();
   }, [subscription?.status]);
 
+  // SÉCURITÉ: Validation et sanitization des entrées
+  const sanitizeInput = (value, maxLength = 200) => {
+    if (!value) return '';
+    return String(value)
+      .slice(0, maxLength)
+      .replace(/<[^>]*>/g, '')
+      .replace(/[<>\"\'`;]/g, '')
+      .trim();
+  };
+
+  const validateVatNumber = (vat) => {
+    if (!vat) return true;
+    // Format TVA européen basique
+    const vatRegex = /^[A-Z]{2}[0-9A-Z]{8,12}$/i;
+    return vatRegex.test(vat.replace(/\s/g, ''));
+  };
+
   const saveBillingInfo = async () => {
+    // Validation
+    if (billingInfo.vat_number && !validateVatNumber(billingInfo.vat_number)) {
+      toast.error('Format de numéro TVA invalide');
+      return;
+    }
+
     setIsUpdating(true);
     try {
       await base44.entities.Subscription.update(subscription.id, {
-        billing_company: billingInfo.company_name,
-        billing_address: billingInfo.address,
-        country: billingInfo.country,
-        vat_number: billingInfo.vat_number
+        billing_company: sanitizeInput(billingInfo.company_name, 100),
+        billing_address: sanitizeInput(billingInfo.address, 300),
+        country: sanitizeInput(billingInfo.country, 50),
+        vat_number: sanitizeInput(billingInfo.vat_number, 20).toUpperCase()
       });
       toast.success('Informations de facturation enregistrées');
       if (onUpdate) onUpdate();
     } catch (error) {
       toast.error('Erreur lors de la sauvegarde');
+      console.error('Billing save error:', error);
     } finally {
       setIsUpdating(false);
     }
