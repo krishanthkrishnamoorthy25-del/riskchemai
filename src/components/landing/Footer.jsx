@@ -99,13 +99,31 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 text-sm">
-            © {currentYear} ChemRisk Pro. Tous droits réservés.
-          </p>
-          <p className="text-slate-500 text-sm">
-            Hébergé en Union Européenne 🇪🇺
-          </p>
+        <div className="border-t border-slate-800 mt-12 pt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+            <p className="text-slate-500 text-sm">
+              Hébergé en Union Européenne 🇪🇺
+            </p>
+            <div className="flex items-center gap-6">
+              <Link to={createPageUrl('Privacy')} className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+                Confidentialité
+              </Link>
+              <Link to={createPageUrl('Terms')} className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+                CGU
+              </Link>
+              <Link to={createPageUrl('Cookies')} className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+                Cookies
+              </Link>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-slate-600 text-xs">
+              © {currentYear} ChemRisk Pro — Une solution développée en France 🇫🇷
+            </p>
+            <p className="text-slate-700 text-[10px] mt-1">
+              ChemRisk Pro® est une marque déposée. Tous droits réservés.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

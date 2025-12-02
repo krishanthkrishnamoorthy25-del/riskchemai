@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, Menu, X, LogOut, User } from 'lucide-react';
+import { FlaskConical, Menu, X, LogOut, User, Moon, Sun, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function Navbar() {
+export default function Navbar({ isDark = false, toggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -40,7 +40,16 @@ export default function Navbar() {
     { name: 'Fonctionnalités', page: 'Features' },
     { name: 'Tarifs', page: 'Pricing' },
     { name: 'Sources', page: 'Sources' },
-    { name: 'À propos', page: 'About' }
+    { 
+      name: 'Ressources', 
+      submenu: [
+        { name: 'À propos', page: 'About' },
+        { name: 'Contact', page: 'Contact' },
+        { name: 'Sécurité', page: 'Security' },
+        { name: 'Changelog', page: 'Changelog' },
+        { name: 'Support', page: 'Support' }
+      ]
+    }
   ];
 
   const isLandingPage = location.pathname === '/' || location.pathname === '/Home';
@@ -69,22 +78,59 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={createPageUrl(link.page)}
-                className={`text-sm font-medium transition-colors ${
-                  isDarkNav 
-                    ? 'text-slate-300 hover:text-white' 
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {link.name}
-              </Link>
+              link.submenu ? (
+                <DropdownMenu key={link.name}>
+                  <DropdownMenuTrigger className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                    isDarkNav 
+                      ? 'text-slate-300 hover:text-white' 
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}>
+                    {link.name}
+                    <ChevronDown className="w-4 h-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-48">
+                    {link.submenu.map((sublink) => (
+                      <DropdownMenuItem key={sublink.name} asChild>
+                        <Link to={createPageUrl(sublink.page)} className="cursor-pointer">
+                          {sublink.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={createPageUrl(link.page)}
+                  className={`text-sm font-medium transition-colors ${
+                    isDarkNav 
+                      ? 'text-slate-300 hover:text-white' 
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
           </div>
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-4">
+            {/* Theme Toggle */}
+            {toggleTheme && (
+              <button
+                onClick={toggleTheme}
+                className={`p-2 rounded-lg transition-colors ${
+                  isDarkNav 
+                    ? 'text-slate-300 hover:text-white hover:bg-white/10' 
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+                title={isDark ? 'Mode clair' : 'Mode sombre'}
+              >
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+            )}
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -154,15 +200,44 @@ export default function Navbar() {
           >
             <div className="px-6 py-4 space-y-4">
               {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={createPageUrl(link.page)}
-                  onClick={() => setMobileOpen(false)}
-                  className="block text-slate-600 hover:text-slate-900 font-medium"
-                >
-                  {link.name}
-                </Link>
+                link.submenu ? (
+                  <div key={link.name} className="space-y-2">
+                    <span className="block text-slate-400 text-sm font-semibold uppercase tracking-wider">
+                      {link.name}
+                    </span>
+                    {link.submenu.map((sublink) => (
+                      <Link
+                        key={sublink.name}
+                        to={createPageUrl(sublink.page)}
+                        onClick={() => setMobileOpen(false)}
+                        className="block text-slate-600 hover:text-slate-900 font-medium pl-3"
+                      >
+                        {sublink.name}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Link
+                    key={link.name}
+                    to={createPageUrl(link.page)}
+                    onClick={() => setMobileOpen(false)}
+                    className="block text-slate-600 hover:text-slate-900 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                )
               ))}
+              
+              {/* Theme Toggle Mobile */}
+              {toggleTheme && (
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium"
+                >
+                  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  {isDark ? 'Mode clair' : 'Mode sombre'}
+                </button>
+              )}
               <div className="pt-4 border-t border-slate-200 space-y-3">
                 {user ? (
                   <>
