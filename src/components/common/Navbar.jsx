@@ -82,6 +82,9 @@ export default function Navbar({ isDark = false, toggleTheme }) {
     { 
       name: 'Ressources', 
       submenu: [
+        { name: 'Cas d\'usage', page: 'UseCases' },
+        { name: 'Pourquoi nous ?', page: 'WhyUs' },
+        { name: 'Démonstration', page: 'Demo' },
         { name: 'À propos', page: 'About' },
         { name: 'Contact', page: 'Contact' },
         { name: 'Sécurité', page: 'Security' },

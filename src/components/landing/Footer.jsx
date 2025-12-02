@@ -11,7 +11,10 @@ export default function Footer() {
       { name: 'Fonctionnalités', page: 'Features' },
       { name: 'Tarifs', page: 'Pricing' },
       { name: 'Dashboard', page: 'Dashboard' },
-      { name: 'Sources scientifiques', page: 'Sources' }
+      { name: 'Sources scientifiques', page: 'Sources' },
+      { name: 'Cas d\'usage', page: 'UseCases' },
+      { name: 'Pourquoi nous ?', page: 'WhyUs' },
+      { name: 'Démonstration', page: 'Demo' }
     ],
     legal: [
       { name: 'Mentions légales', page: 'Legal' },

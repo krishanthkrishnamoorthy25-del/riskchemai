@@ -14,6 +14,10 @@ import AnalysisHistory from '@/components/dashboard/AnalysisHistory';
 import ChemicalAnalysisForm from '@/components/analysis/ChemicalAnalysisForm';
 import RampeTable from '@/components/analysis/RampeTable';
 import ReactionSimulator from '@/components/analysis/ReactionSimulator';
+import ChemicalSafetyGuide from '@/components/analysis/ChemicalSafetyGuide';
+import IncompatibilityMatrix from '@/components/analysis/IncompatibilityMatrix';
+import AdvancedRiskAnalysis from '@/components/analysis/AdvancedRiskAnalysis';
+import SimplifiedSDS from '@/components/analysis/SimplifiedSDS';
 import OnboardingTour from '@/components/common/OnboardingTour';
 import NotificationCenter from '@/components/common/NotificationCenter';
 import GlobalSearch from '@/components/common/GlobalSearch';
@@ -508,14 +512,33 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-8 space-y-6"
           >
+            {/* Tableau RAMPE principal */}
             <RampeTable 
               results={analysisResults} 
               onExport={handleExport}
               onQuickSearch={canAnalyze() ? handleQuickSearch : null}
               isSearching={isQuickSearching}
             />
+            
+            {/* Analyse de risques avancée */}
+            <AdvancedRiskAnalysis substances={analysisResults} />
+            
+            {/* Matrice d'incompatibilités */}
+            <IncompatibilityMatrix substances={analysisResults} />
+            
+            {/* Guide de manipulation sécurisée */}
+            <ChemicalSafetyGuide substances={analysisResults} />
+            
+            {/* FDS simplifiées pour chaque substance */}
+            {analysisResults.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-4">
+                {analysisResults.slice(0, 4).map((substance, index) => (
+                  <SimplifiedSDS key={index} substance={substance} />
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
 
