@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FlaskConical, Users, Zap, Shield } from 'lucide-react';
+import { Clock, Users, Sparkles, TrendingUp } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 
 export default function LiveStats() {
-  // Simulated live counters (in production, these would come from an API)
-  const [stats, setStats] = useState({
-    analyses: 127453,
-    users: 2847,
-    reactions: 45892,
-    uptime: 99.97
+  // Fetch real subscriber count from database
+  const { data: subscriptions } = useQuery({
+    queryKey: ['public-subscriber-count'],
+    queryFn: async () => {
+      try {
+        const subs = await base44.entities.Subscription.filter({
+          status: 'active'
+        });
+        const trialSubs = await base44.entities.Subscription.filter({
+          status: 'trialing'
+        });
+        return [...subs, ...trialSubs];
+      } catch {
+        return [];
+      }
+    },
+    staleTime: 60000, // Cache 1 minute
+    refetchInterval: 30000 // Refresh every 30s
   });
 
-  // Simulate live updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStats(prev => ({
-        analyses: prev.analyses + Math.floor(Math.random() * 3),
-        users: prev.users,
-        reactions: prev.reactions + Math.floor(Math.random() * 2),
-        uptime: 99.97
-      }));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const subscriberCount = subscriptions?.length || 0;
 
   const formatNumber = (num) => {
     return new Intl.NumberFormat('fr-FR').format(num);
@@ -31,37 +33,42 @@ export default function LiveStats() {
 
   const statItems = [
     {
-      icon: FlaskConical,
-      value: formatNumber(stats.analyses),
-      label: "Analyses réalisées",
+      icon: Clock,
+      value: "90%",
+      label: "Gain de temps sur vos analyses",
       color: "text-emerald-600",
-      bgColor: "bg-emerald-50"
+      bgColor: "bg-emerald-50",
+      darkBgColor: "dark:bg-emerald-900/30"
     },
     {
       icon: Users,
-      value: formatNumber(stats.users),
-      label: "Utilisateurs actifs",
+      value: formatNumber(subscriberCount),
+      label: "Clients nous font confiance",
       color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      bgColor: "bg-blue-50",
+      darkBgColor: "dark:bg-blue-900/30",
+      live: true
     },
     {
-      icon: Zap,
-      value: formatNumber(stats.reactions),
-      label: "Réactions simulées",
+      icon: Sparkles,
+      value: "Précis",
+      label: "Données vérifiées PubChem & ECHA",
       color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      bgColor: "bg-purple-50",
+      darkBgColor: "dark:bg-purple-900/30"
     },
     {
-      icon: Shield,
-      value: `${stats.uptime}%`,
-      label: "Disponibilité",
+      icon: TrendingUp,
+      value: "100%",
+      label: "Conformité RGPD garantie",
       color: "text-amber-600",
-      bgColor: "bg-amber-50"
+      bgColor: "bg-amber-50",
+      darkBgColor: "dark:bg-amber-900/30"
     }
   ];
 
   return (
-    <section className="py-12 bg-white border-y border-slate-100">
+    <section className="py-12 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {statItems.map((stat, index) => (
@@ -77,21 +84,27 @@ export default function LiveStats() {
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
               <div>
-                <p className={`text-2xl font-bold ${stat.color}`}>
-                  {stat.value}
-                </p>
-                <p className="text-sm text-slate-500">{stat.label}</p>
+                <div className="flex items-center gap-2">
+                  <p className={`text-2xl font-bold ${stat.color}`}>
+                    {stat.value}
+                  </p>
+                  {stat.live && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          Données mises à jour en temps réel
+        <div className="mt-8 text-center">
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            <span className="font-semibold text-emerald-600">ChemRisk Pro</span> — L'outil indispensable pour les professionnels HSE, chimistes et laboratoires
+          </p>
         </div>
       </div>
     </section>

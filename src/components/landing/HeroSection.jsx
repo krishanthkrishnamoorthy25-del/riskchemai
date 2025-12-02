@@ -58,9 +58,9 @@ export default function HeroSection() {
 
             <div className="grid grid-cols-3 gap-6">
               {[
-                { label: 'Substances analysées', value: '50K+' },
-                { label: 'Entreprises actives', value: '2,500+' },
-                { label: 'Temps moyen analyse', value: '< 3s' }
+                { label: 'Gain de temps', value: '90%', desc: 'vs analyse manuelle' },
+                { label: 'Sources vérifiées', value: '100%', desc: 'PubChem & ECHA' },
+                { label: 'Analyse express', value: '< 10s', desc: 'par substance' }
               ].map((stat, i) => (
                 <div key={i} className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-white">{stat.value}</div>
