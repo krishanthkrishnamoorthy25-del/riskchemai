@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   CreditCard, 
   Calendar, 
@@ -13,7 +15,9 @@ import {
   XCircle,
   Sparkles,
   Lock,
-  ArrowUpCircle
+  ArrowUpCircle,
+  Building,
+  MapPin
 } from 'lucide-react';
 import { format, addMonths, addYears, isAfter, isBefore } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -37,6 +41,55 @@ export default function SubscriptionManager({ subscription, onUpdate }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [billingInfo, setBillingInfo] = useState({
+    company_name: subscription?.billing_company || '',
+    address: subscription?.billing_address || '',
+    country: subscription?.country || 'France',
+    vat_number: subscription?.vat_number || ''
+  });
+
+  // Envoyer les emails lors d'un nouvel abonnement
+  useEffect(() => {
+    const sendEmails = async () => {
+      if (subscription?.status === 'active' && !subscription?.welcome_email_sent) {
+        try {
+          // Email de confirmation
+          await base44.functions.invoke('sendSubscriptionEmail', {
+            type: 'subscription_confirmation',
+            userEmail: subscription.user_email,
+            userName: subscription.user_name || '',
+            planName: subscription.plan
+          });
+          
+          // Marquer comme envoyé
+          await base44.entities.Subscription.update(subscription.id, {
+            welcome_email_sent: true
+          });
+        } catch (e) {
+          console.error('Email error:', e);
+        }
+      }
+    };
+    sendEmails();
+  }, [subscription?.status]);
+
+  const saveBillingInfo = async () => {
+    setIsUpdating(true);
+    try {
+      await base44.entities.Subscription.update(subscription.id, {
+        billing_company: billingInfo.company_name,
+        billing_address: billingInfo.address,
+        country: billingInfo.country,
+        vat_number: billingInfo.vat_number
+      });
+      toast.success('Informations de facturation enregistrées');
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      toast.error('Erreur lors de la sauvegarde');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   if (!subscription) return null;
 
@@ -390,6 +443,75 @@ export default function SubscriptionManager({ subscription, onUpdate }) {
             </div>
           </div>
         </div>
+
+        {/* Billing Info */}
+        {subscription.plan !== 'trial' && (
+          <div className="pt-4 border-t border-slate-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Building className="w-4 h-4 text-slate-500" />
+              <p className="text-sm font-medium text-slate-700">Informations de facturation</p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <Label className="text-xs text-slate-500">Nom / Raison sociale</Label>
+                <Input
+                  value={billingInfo.company_name}
+                  onChange={(e) => setBillingInfo({...billingInfo, company_name: e.target.value})}
+                  placeholder="Votre nom ou société"
+                  className="h-9"
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-slate-500">Adresse</Label>
+                <Input
+                  value={billingInfo.address}
+                  onChange={(e) => setBillingInfo({...billingInfo, address: e.target.value})}
+                  placeholder="Adresse de facturation"
+                  className="h-9"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs text-slate-500">Pays</Label>
+                  <Input
+                    value={billingInfo.country}
+                    onChange={(e) => setBillingInfo({...billingInfo, country: e.target.value})}
+                    placeholder="France"
+                    className="h-9"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-500">N° TVA (optionnel)</Label>
+                  <Input
+                    value={billingInfo.vat_number}
+                    onChange={(e) => setBillingInfo({...billingInfo, vat_number: e.target.value})}
+                    placeholder="FR12345678901"
+                    className="h-9"
+                  />
+                </div>
+              </div>
+              <Button 
+                onClick={saveBillingInfo} 
+                disabled={isUpdating}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                {isUpdating ? 'Enregistrement...' : 'Enregistrer'}
+              </Button>
+            </div>
+            <div className="mt-4 p-3 bg-emerald-50 rounded-lg">
+              <div className="flex items-start gap-2">
+                <Lock className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-emerald-700">
+                  <p className="font-medium">Paiements 100% sécurisés</p>
+                  <p>Vos données bancaires sont gérées exclusivement par Stripe (certifié PCI-DSS). 
+                  Nous n'avons jamais accès à vos numéros de carte.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
 
       {/* Upgrade Modal */}
