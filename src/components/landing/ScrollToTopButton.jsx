@@ -25,7 +25,7 @@ export default function ScrollToTopButton() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-colors"
+          className="fixed bottom-20 right-4 z-50 w-10 h-10 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-colors"
           title="Retour en haut"
         >
           <ArrowUp className="w-5 h-5" />
