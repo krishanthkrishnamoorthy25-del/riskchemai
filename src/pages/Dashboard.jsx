@@ -525,6 +525,7 @@ IMPORTANT: Ne fournis AUCUN protocole expérimental.`;
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
+            data-tour="simulator"
           >
             <ReactionSimulator 
               canSimulate={canAnalyze('simulator')} 
