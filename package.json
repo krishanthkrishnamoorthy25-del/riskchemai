@@ -2,16 +2,15 @@
   "name": "chemrisk-ai",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "vercel-build": "vite build",
-  "lint": "eslint .",
-  "lint:fix": "eslint . --fix",
-  "typecheck": "tsc -p ./jsconfig.json",
-  "preview": "vite preview"
-}
+    "dev": "vite",
+    "build": "vite build",
+    "vercel-build": "vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc -p ./jsconfig.json",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@base44/sdk": "^0.8.3",
     "@base44/vite-plugin": "^0.2.5",
