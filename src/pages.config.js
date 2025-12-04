@@ -21,8 +21,8 @@ import WhyUs from './pages/WhyUs';
 import Demo from './pages/Demo';
 import Limitations from './pages/Limitations';
 import News from './pages/News';
+import Login from './pages/Login'; // <- ajouté
 import __Layout from './Layout.jsx';
-
 
 export const PAGES = {
     "Home": Home,
@@ -48,7 +48,8 @@ export const PAGES = {
     "Demo": Demo,
     "Limitations": Limitations,
     "News": News,
-}
+    "Login": Login, // <- ajouté
+};
 
 export const pagesConfig = {
     mainPage: "Home",
